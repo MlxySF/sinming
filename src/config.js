@@ -8,6 +8,32 @@
 
 export const ACADEMY = {
   name: 'Wushu Sport Academy',
+
+  /* ------------------------------------------------------------------------
+     ACADEMY LOGO
+     ------------------------------------------------------------------------
+     Leave '' to keep the built-in gold "武" seal.
+
+     A) Use a link (easiest — the image must be a DIRECT image URL, https):
+          logoUrl: 'https://your-site.com/logo.png',
+
+     B) Use a file inside this project (recommended — fastest + no CORS):
+          1. save your logo as   src/assets/logo.png
+          2. add this at the very top of this file:
+               import logo from './assets/logo.png';
+          3. set:
+               logoUrl: logo,
+
+     C) Use a file in the public folder:
+          1. save your logo as   public/logo.png
+          2. set:
+               logoUrl: import.meta.env.BASE_URL + 'logo.png',
+
+     Tip: a square PNG with a transparent background, at least 200×200 px,
+     looks best. Landscape logos also work — they are fitted inside the square.
+     ------------------------------------------------------------------------ */
+  logoUrl: '',
+
   email: 'admin@wushusportacademy.com',
   phone: '019-219 1688',
   whatsapp: '019-219 1688',

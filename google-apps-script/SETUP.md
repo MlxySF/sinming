@@ -42,6 +42,7 @@ const CONFIG = {
   ACADEMY_PHONE: '019-219 1688',
   ACADEMY_ADDRESS: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
   ACADEMY_COMPANY_NO: '202301234567',
+  LOGO_URL: '',              // optional public https link — shows in emails
 
   BANK_BANK_NAME: 'Maybank',
   BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',

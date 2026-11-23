@@ -79,7 +79,7 @@ GitHub Pages, plus a go-live checklist and troubleshooting.
 
 | Export | What it controls |
 | --- | --- |
-| `ACADEMY` | Name, email, phone, address, SSM/company number (site, PDF and emails) |
+| `ACADEMY` | Name, email, phone, address, SSM/company number, **logo link** (site, PDF and emails) |
 | `BANK` | Bank name, account name/number, DuitNow ID |
 | `PAYMENT_TERMS` | The term checkboxes — term number, year, start/end dates, sessions, price (RM) |
 | `formatMoney` | Currency formatting (`RM`) |

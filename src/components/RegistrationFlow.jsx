@@ -6,6 +6,7 @@ import StepParent from '../steps/StepParent';
 import StepAthlete from '../steps/StepAthlete';
 import StepPayment from '../steps/StepPayment';
 import LanguageToggle from './LanguageToggle';
+import BrandMark from './BrandMark';
 import { buildAgreementPdf } from '../lib/agreement';
 import { submitRegistration } from '../lib/submit';
 import { termOptionsOf, totalOf } from '../lib/terms';
@@ -269,13 +270,7 @@ export default function RegistrationFlow({ onComplete, onExit }) {
           </button>
 
           <div className="brand" aria-label={ACADEMY.name}>
-            <span
-              className="brand__seal"
-              style={{ width: 36, height: 36, fontSize: 19 }}
-              aria-hidden="true"
-            >
-              武
-            </span>
+            <BrandMark size={36} />
             <span className="brand__text">
               <span className="brand__name" style={{ fontSize: 11.5 }}>
                 {ACADEMY.name}

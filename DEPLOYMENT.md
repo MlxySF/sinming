@@ -227,6 +227,62 @@ Open <http://localhost:5173>. Every save refreshes the page instantly.
 
 ---
 
+### Add your academy logo
+
+The header shows a gold **武** seal until you give it a logo. Set one line in
+`src/config.js` → `ACADEMY.logoUrl`.
+
+**Option A — you already have a link (easiest)**
+
+```js
+logoUrl: 'https://your-site.com/logo.png',
+```
+
+It must be a **direct image link** ending in `.png`, `.jpg`, `.svg` or `.webp`.
+Opening the link in a new tab should show *only the image* — not a web page, a
+Google Drive preview or a Facebook photo page. If your logo lives in Google
+Drive, download it and use Option B or C instead (Drive share links do not work
+as images). The link must be **https://** if your site is https.
+
+**Option B — the file lives in this project (recommended)**
+
+1. Save your logo as `src/assets/logo.png` (square PNG, transparent background,
+   200×200 px or larger).
+2. At the very top of `src/config.js`, add:
+
+   ```js
+   import logo from './assets/logo.png';
+   ```
+
+3. Set:
+
+   ```js
+   logoUrl: logo,
+   ```
+
+Vite bundles the file, adds a cache-busting hash and serves it from your own
+domain — no external dependency, no CORS, fastest option.
+
+**Option C — file in the `public` folder**
+
+1. Save it as `public/logo.png`.
+2. In `src/config.js`:
+
+   ```js
+   logoUrl: import.meta.env.BASE_URL + 'logo.png',
+   ```
+
+**After any of the above:** `npm run build` → re-upload `dist`. The logo also
+becomes the browser tab icon automatically.
+
+**Email logo (optional):** set `LOGO_URL` in the `CONFIG` block of
+`google-apps-script/Code.gs` to the same public https link, then deploy a new
+version — the confirmation email will show it. (A remote link is required here,
+because Google's servers send the email.)
+
+> The signed PDF keeps the text header; embedding a logo there would require
+> converting the image to base64 and is not enabled by default.
+
 ## Part 8 — Go-live checklist
 
 - [ ] `npm run build` finishes with no errors.

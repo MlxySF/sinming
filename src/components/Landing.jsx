@@ -4,6 +4,7 @@ import { useI18n } from '../i18n';
 import { allTermOptions } from '../lib/terms';
 import { ArrowRight, Check } from './Icons';
 import LanguageToggle from './LanguageToggle';
+import BrandMark from './BrandMark';
 import heroImage from '../assets/hero-wushu.jpg';
 
 function FeeDialog({ open, onClose, onStart }) {
@@ -89,9 +90,7 @@ export default function Landing({ onStart }) {
 
       <header className="nav">
         <div className="brand">
-          <span className="brand__seal" aria-hidden="true">
-            武
-          </span>
+          <BrandMark size={46} />
           <span className="brand__text">
             <span className="brand__name">{ACADEMY.name}</span>
             <span className="brand__sub">{m.brand.sub}</span>

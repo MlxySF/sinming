@@ -36,6 +36,9 @@ const CONFIG = {
   ACADEMY_ADDRESS: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
   ACADEMY_COMPANY_NO: '202301234567',
 
+  // Optional: a public https link to your logo — shown at the top of emails.
+  LOGO_URL: '',
+
   BANK_BANK_NAME: 'Maybank',
   BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',
   BANK_ACCOUNT_NO: '5123 4567 8901',
@@ -473,6 +476,11 @@ function emailShell_(copy, title, preheader, inner) {
     '<div style="max-width:600px;margin:0 auto;background:#fffdf9;border:1px solid #e3dacb;border-radius:18px;overflow:hidden;box-shadow:0 18px 44px -30px rgba(20,16,8,.5);">' +
     /* dark header */
     '<div style="background:#0b0d10;padding:30px 32px 26px;border-bottom:3px solid #e0b45c;">' +
+    (CONFIG.LOGO_URL
+      ? '<img src="' +
+        CONFIG.LOGO_URL +
+        '" alt="" width="44" height="44" style="display:block;width:44px;height:44px;object-fit:contain;margin-bottom:14px;border-radius:10px;background:#ffffff14;">'
+      : '') +
     '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#e0b45c;">' +
     esc_(CONFIG.ACADEMY_NAME) +
     '</div>' +
