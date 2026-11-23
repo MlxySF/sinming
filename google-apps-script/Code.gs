@@ -32,23 +32,19 @@ const CONFIG = {
 
   ACADEMY_NAME: 'Wushu Sport Academy',
   ACADEMY_EMAIL: 'admin@wushusportacademy.com',
-  ACADEMY_PHONE: '+65 8123 4567',
-  ACADEMY_ADDRESS: '12 Sin Ming Lane, #04-08, Singapore 573968',
-  ACADEMY_UEN: '202312345A',
+  ACADEMY_PHONE: '019-219 1688',
+  ACADEMY_ADDRESS: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
+  ACADEMY_COMPANY_NO: '202301234567',
 
-  BANK_BANK_NAME: 'DBS Bank (Singapore)',
-  BANK_ACCOUNT_NAME: 'Wushu Sport Academy Pte Ltd',
-  BANK_ACCOUNT_NO: '012-345678-9',
-  BANK_PAYNOW: 'UEN 202312345A',
-
-  // Optional: set a random word here AND in the website's .env (VITE_FORM_TOKEN)
-  // so only your own website can post to this endpoint. Leave '' to disable.
-  SHARED_TOKEN: '',
+  BANK_BANK_NAME: 'Maybank',
+  BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',
+  BANK_ACCOUNT_NO: '5123 4567 8901',
+  BANK_DUITNOW: '019-219 1688',
 
   SEND_PARENT_EMAIL: true,
   SEND_ADMIN_EMAIL: true,
 
-  TIMEZONE: 'Asia/Singapore',
+  TIMEZONE: 'Asia/Kuala_Lumpur',
 };
 
 const HEADERS = [
@@ -68,7 +64,7 @@ const HEADERS = [
   'School',
   'Class',
   'Terms',
-  'Total Due (SGD)',
+  'Total Due (RM)',
   'Receipt File',
   'Receipt Link',
   'Agreement File',
@@ -160,7 +156,7 @@ function doPost(e) {
       parent.ic || '',
       parent.phone || '',
       parent.email || '',
-      parent.relationship || '',
+      parent.relationshipLabel || parent.relationship || '',
       athlete.name || '',
       athlete.chineseName || '',
       athlete.ic || '',
@@ -187,7 +183,7 @@ function doPost(e) {
           to: parent.email,
           name: CONFIG.ACADEMY_NAME,
           replyTo: CONFIG.ACADEMY_EMAIL,
-          subject: '✅ Registration received — ' + athlete.name + ' (' + ref + ')',
+          subject: emailCopy_(data).subject(athlete.name, ref),
           htmlBody: parentEmailHtml_(data, ref, stamp, receiptFile, agreementFile),
           attachments: agreementFile ? [agreementFile.getBlob()] : [],
         });
@@ -288,7 +284,7 @@ function getSheet_() {
     header.setVerticalAlignment('middle');
     sheet.setRowHeight(1, 34);
     sheet.setFrozenRows(1);
-    sheet.getRange(2, 17, 500, 1).setNumberFormat('"S$"#,##0.00');
+    sheet.getRange(2, 17, 500, 1).setNumberFormat('"RM"#,##0.00');
     sheet.setColumnWidth(1, 150);
     sheet.setColumnWidth(2, 150);
     sheet.setColumnWidth(7, 220);
@@ -349,10 +345,11 @@ function nowStamp_() {
 
 function money_(value) {
   const n = Number(value || 0);
-  return 'S$' + (Math.round(n * 100) / 100).toLocaleString('en-SG', {
+  const body = (Math.round(n * 100) / 100).toLocaleString('en-MY', {
     minimumFractionDigits: n % 1 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
   });
+  return 'RM' + body;
 }
 
 function esc_(value) {
@@ -379,7 +376,98 @@ function row_(label, value) {
    EMAIL TEMPLATES
    ========================================================================== */
 
-function emailShell_(title, preheader, inner) {
+const EMAIL_COPY = {
+  en: {
+    subject: (name, ref) => '✅ Registration received — ' + name + ' (' + ref + ')',
+    title: 'Registration received',
+    preheader: (ref) => 'We have your signed agreement and receipt — reference ' + ref,
+    dear: (name) => 'Dear ' + name + ',',
+    intro: (athlete) =>
+      'Thank you for registering ' + athlete + ' with Wushu Sport Academy. We have received your signed agreement and payment receipt — our admin team is verifying the payment now (usually within one working day).',
+    refLabel: 'Registration reference',
+    submitted: (stamp) => 'Submitted ' + stamp,
+    yourRegistration: 'Your registration',
+    labels: {
+      athlete: 'Athlete',
+      chineseName: 'Chinese name',
+      ageGender: 'Age / Gender',
+      schoolClass: 'School / Class',
+      parent: 'Parent',
+      mobile: 'Mobile',
+      email: 'Email',
+    },
+    termFees: 'Term fees selected',
+    classes: 'classes',
+    totalDue: 'Total amount due',
+    payment: 'Payment details',
+    paymentLabels: {
+      bank: 'Bank',
+      accountName: 'Account name',
+      accountNumber: 'Account number',
+      duitnow: 'DuitNow',
+    },
+    attached: (name) => '📎 Your signed agreement (<b>' + name + '</b>) is attached to this email. Keep it for your records.',
+    receiptReceived: (name) => '🧾 Receipt received: <b>' + name + '</b> — now pending verification.',
+    nextTitle: 'What happens next',
+    next: [
+      'We verify your payment receipt.',
+      'You receive a WhatsApp message with the venue, timing and first-lesson details.',
+      'Please arrive 10 minutes early on the first day with a water bottle and indoor shoes.',
+    ],
+    questions: 'Questions? Reply to this email or WhatsApp us at ',
+    regards: 'Warm regards,',
+    team: 'Admin Team',
+    footerNote: 'This is an automated confirmation of your registration.',
+  },
+  zh: {
+    subject: (name, ref) => '✅ 已收到报名 — ' + name + '（' + ref + '）',
+    title: '报名已收到',
+    preheader: (ref) => '已收到您签署的同意书与收据 —— 报名编号 ' + ref,
+    dear: (name) => '尊敬的 ' + name + '：',
+    intro: (athlete) =>
+      '感谢您为 ' + athlete + ' 报名参加 Wushu Sport Academy 的课程。我们已收到您签署的同意书及付款收据，行政团队正在核对付款（通常在一个工作日内完成）。',
+    refLabel: '报名编号',
+    submitted: (stamp) => '提交时间：' + stamp,
+    yourRegistration: '您的报名资料',
+    labels: {
+      athlete: '学员',
+      chineseName: '中文姓名',
+      ageGender: '年龄 / 性别',
+      schoolClass: '学校 / 班级',
+      parent: '家长',
+      mobile: '手机',
+      email: '电邮',
+    },
+    termFees: '已选学期',
+    classes: '堂课',
+    totalDue: '应付总额',
+    payment: '付款方式',
+    paymentLabels: {
+      bank: '银行',
+      accountName: '户名',
+      accountNumber: '账号',
+      duitnow: 'DuitNow',
+    },
+    attached: (name) => '📎 您签署的同意书（<b>' + name + '</b>）已附在本电邮中，请妥善保存。',
+    receiptReceived: (name) => '🧾 已收到收据：<b>' + name + '</b> —— 正在核对中。',
+    nextTitle: '接下来',
+    next: [
+      '我们会核对您的付款收据。',
+      '您会收到 WhatsApp 讯息，通知上课地点、时间及第一堂课详情。',
+      '第一堂课请提前 10 分钟抵达，并自备水瓶与室内鞋。',
+    ],
+    questions: '如有疑问，请回覆此电邮，或 WhatsApp 联络 ',
+    regards: '此致，',
+    team: '行政团队',
+    footerNote: '此电邮由系统自动发送，作为报名确认。',
+  },
+};
+
+function emailCopy_(data) {
+  return EMAIL_COPY[data && data.lang === 'zh' ? 'zh' : 'en'];
+}
+
+function emailShell_(copy, title, preheader, inner) {
   return (
     '<div style="background:#f7f2e8;padding:28px 12px;">' +
     '<div style="max-width:600px;margin:0 auto;background:#fffdf9;border:1px solid #e3dacb;border-radius:18px;overflow:hidden;box-shadow:0 18px 44px -30px rgba(20,16,8,.5);">' +
@@ -402,8 +490,8 @@ function emailShell_(title, preheader, inner) {
     /* footer */
     '<div style="background:#0b0d10;padding:20px 32px;font:400 11px/1.7 Helvetica,Arial,sans-serif;color:rgba(244,239,230,.5);">' +
     esc_(CONFIG.ACADEMY_NAME) +
-    ' · UEN ' +
-    esc_(CONFIG.ACADEMY_UEN) +
+    ' · SSM ' +
+    esc_(CONFIG.ACADEMY_COMPANY_NO) +
     '<br>' +
     esc_(CONFIG.ACADEMY_ADDRESS) +
     '<br>' +
@@ -416,17 +504,20 @@ function emailShell_(title, preheader, inner) {
     '</div>' +
     '</div>' +
     '<div style="max-width:600px;margin:14px auto 0;text-align:center;font:400 10px/1.6 Helvetica,Arial,sans-serif;color:#a9a294;">' +
-    'This is an automated confirmation of your registration.' +
+    esc_(copy.footerNote) +
     '</div>' +
     '</div>'
   );
 }
 
 function parentEmailHtml_(data, ref, stamp, receiptFile, agreementFile) {
+  const copy = emailCopy_(data);
   const parent = data.parent || {};
   const athlete = data.athlete || {};
   const terms = Array.isArray(data.terms) ? data.terms : [];
   const total = money_(data.total);
+  const L = copy.labels;
+  const P = copy.paymentLabels;
 
   const termRows = terms
     .map(
@@ -438,7 +529,9 @@ function parentEmailHtml_(data, ref, stamp, receiptFile, agreementFile) {
         esc_(t.period) +
         ' · ' +
         esc_(t.sessions) +
-        ' classes</span></td>' +
+        ' ' +
+        esc_(copy.classes) +
+        '</span></td>' +
         '<td style="padding:9px 0;border-bottom:1px dashed #e3dacb;font:700 13px/1.5 Helvetica,Arial,sans-serif;color:#14171c;text-align:right;white-space:nowrap;">' +
         money_(t.price) +
         '</td></tr>'
@@ -446,88 +539,104 @@ function parentEmailHtml_(data, ref, stamp, receiptFile, agreementFile) {
     .join('');
 
   const inner =
-    '<p style="margin:0 0 18px;font:400 14px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;">Dear ' +
-    esc_(parent.name) +
-    ',</p>' +
+    '<p style="margin:0 0 18px;font:400 14px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;">' +
+    esc_(copy.dear(parent.name)) +
+    '</p>' +
     '<p style="margin:0 0 22px;font:400 14px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;">' +
-    'Thank you for registering <b>' +
-    esc_(athlete.name) +
-    '</b> with ' +
-    esc_(CONFIG.ACADEMY_NAME) +
-    '. We have received your signed agreement and payment receipt — our admin team is verifying the payment now ' +
-    '(usually within one working day).</p>' +
+    copy.intro('<b>' + esc_(athlete.name) + '</b>') +
+    '</p>' +
     /* reference pill */
     '<div style="border:1px dashed #d9c8a4;background:#fdf8ee;border-radius:12px;padding:14px 18px;margin-bottom:22px;">' +
-    '<div style="font:600 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#a97e2f;">Registration reference</div>' +
+    '<div style="font:600 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#a97e2f;">' +
+    esc_(copy.refLabel) +
+    '</div>' +
     '<div style="margin-top:6px;font:700 18px/1.3 Helvetica,Arial,sans-serif;color:#14171c;letter-spacing:.06em;">' +
     esc_(ref) +
     '</div>' +
-    '<div style="margin-top:4px;font:400 11px/1.5 Helvetica,Arial,sans-serif;color:#8b8f98;">Submitted ' +
-    esc_(stamp) +
+    '<div style="margin-top:4px;font:400 11px/1.5 Helvetica,Arial,sans-serif;color:#8b8f98;">' +
+    esc_(copy.submitted(stamp)) +
     '</div></div>' +
     /* details */
-    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c8102e;margin-bottom:10px;">Your registration</div>' +
+    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c8102e;margin-bottom:10px;">' +
+    esc_(copy.yourRegistration) +
+    '</div>' +
     '<table cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #ece6da;border-radius:12px;border-collapse:separate;overflow:hidden;margin-bottom:22px;">' +
-    row_('Athlete', athlete.name) +
-    row_('Chinese name', athlete.chineseName || '—') +
-    row_('Age / Gender', (athlete.age || '—') + ' · ' + (athlete.gender || '—')) +
-    row_('School / Class', (athlete.school || '—') + ' · ' + (athlete.className || '—')) +
-    row_('Parent', parent.name + ' (' + (parent.relationship || 'Guardian') + ')') +
-    row_('Mobile', parent.phone) +
-    row_('Email', parent.email) +
+    row_(L.athlete, athlete.name) +
+    row_(L.chineseName, athlete.chineseName || '—') +
+    row_(L.ageGender, (athlete.age || '—') + ' · ' + (athlete.gender || '—')) +
+    row_(L.schoolClass, (athlete.school || '—') + ' · ' + (athlete.className || '—')) +
+    row_(L.parent, parent.name + ' (' + (parent.relationshipLabel || parent.relationship || '') + ')') +
+    row_(L.mobile, parent.phone) +
+    row_(L.email, parent.email) +
     '</table>' +
     /* fees */
-    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c8102e;margin-bottom:10px;">Term fees selected</div>' +
+    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c8102e;margin-bottom:10px;">' +
+    esc_(copy.termFees) +
+    '</div>' +
     '<table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:8px;">' +
     termRows +
     '</table>' +
     '<table cellpadding="0" cellspacing="0" width="100%" style="background:#0b0d10;border-radius:12px;margin-bottom:24px;">' +
-    '<tr><td style="padding:16px 18px;font:600 10px/1.4 Helvetica,Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,239,230,.6);">Total amount due</td>' +
+    '<tr><td style="padding:16px 18px;font:600 10px/1.4 Helvetica,Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,239,230,.6);">' +
+    esc_(copy.totalDue) +
+    '</td>' +
     '<td style="padding:16px 18px;text-align:right;font:700 22px/1 Helvetica,Arial,sans-serif;color:#f3d79a;">' +
     total +
     '</td></tr></table>' +
     /* payment instructions */
     '<div style="border:1px solid #ece6da;border-radius:12px;padding:16px 18px;margin-bottom:22px;background:#fbf7ef;">' +
-    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#14171c;margin-bottom:10px;">Payment details</div>' +
+    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#14171c;margin-bottom:10px;">' +
+    esc_(copy.payment) +
+    '</div>' +
     '<div style="font:400 12.5px/1.9 Helvetica,Arial,sans-serif;color:#3c4048;">' +
-    'Bank: <b>' +
+    esc_(P.bank) +
+    ': <b>' +
     esc_(CONFIG.BANK_BANK_NAME) +
-    '</b><br>Account name: <b>' +
+    '</b><br>' +
+    esc_(P.accountName) +
+    ': <b>' +
     esc_(CONFIG.BANK_ACCOUNT_NAME) +
-    '</b><br>Account number: <b>' +
+    '</b><br>' +
+    esc_(P.accountNumber) +
+    ': <b>' +
     esc_(CONFIG.BANK_ACCOUNT_NO) +
-    '</b><br>PayNow: <b>' +
-    esc_(CONFIG.BANK_PAYNOW) +
+    '</b><br>' +
+    esc_(P.duitnow) +
+    ': <b>' +
+    esc_(CONFIG.BANK_DUITNOW) +
     '</b>' +
     '</div></div>' +
     /* attachments */
-    (agreementFile
-      ? '<div style="font:400 12.5px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;margin-bottom:16px;">📎 Your signed agreement (<b>' +
-        esc_(agreementFile.getName()) +
-        '</b>) is attached to this email. Keep it for your records.</div>'
-      : '') +
-    (receiptFile
-      ? '<div style="font:400 12.5px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;margin-bottom:16px;">🧾 Receipt received: <b>' +
-        esc_(receiptFile.getName()) +
-        '</b> — now pending verification.</div>'
-      : '') +
+    (agreementFile ? '<div style="font:400 12.5px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;margin-bottom:12px;">' + copy.attached(esc_(agreementFile.getName())) + '</div>' : '') +
+    (receiptFile ? '<div style="font:400 12.5px/1.7 Helvetica,Arial,sans-serif;color:#3c4048;margin-bottom:16px;">' + copy.receiptReceived(esc_(receiptFile.getName())) + '</div>' : '') +
     /* next steps */
     '<div style="border-left:3px solid #c8102e;padding:4px 0 4px 14px;margin-bottom:22px;">' +
-    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#c8102e;margin-bottom:8px;">What happens next</div>' +
-    '<div style="font:400 12.5px/1.8 Helvetica,Arial,sans-serif;color:#3c4048;">1. We verify your payment receipt.<br>2. You receive a WhatsApp message with the venue, timing and first-lesson details.<br>3. Please arrive 10 minutes early on the first day with a water bottle and indoor shoes.</div>' +
+    '<div style="font:700 10px/1 Helvetica,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#c8102e;margin-bottom:8px;">' +
+    esc_(copy.nextTitle) +
+    '</div>' +
+    '<div style="font:400 12.5px/1.8 Helvetica,Arial,sans-serif;color:#3c4048;">' +
+    copy.next
+      .map(function (line, index) {
+        return index + 1 + '. ' + esc_(line);
+      })
+      .join('<br>') +
+    '</div>' +
     '</div>' +
     '<div style="border-top:1px solid #ece6da;padding-top:18px;font:400 12px/1.7 Helvetica,Arial,sans-serif;color:#6c7079;">' +
-    'Questions? Reply to this email or WhatsApp us at ' +
+    esc_(copy.questions) +
+    '<a href="https://wa.me/' +
+    String(parent.phoneIntl || CONFIG.ACADEMY_PHONE).replace(/[^\d]/g, '') +
+    '" style="color:#c8102e;text-decoration:none;font-weight:600;">WhatsApp ' +
     esc_(CONFIG.ACADEMY_PHONE) +
-    '. We are happy to help.<br><br>Warm regards,<br><b style="color:#14171c;">' +
+    '</a><br><br>' +
+    esc_(copy.regards) +
+    '<br><b style="color:#14171c;">' +
     esc_(CONFIG.ACADEMY_NAME) +
-    ' — Admin Team</b></div>';
+    ' — ' +
+    esc_(copy.team) +
+    '</b></div>';
 
-  return emailShell_(
-    'Registration received',
-    'We have your signed agreement and receipt — reference ' + ref,
-    inner
-  );
+  return emailShell_(copy, copy.title, copy.preheader(ref), inner);
 }
 
 function adminEmailHtml_(data, ref, stamp, receiptFile, agreementFile, signatureFile, sheet) {
@@ -552,8 +661,8 @@ function adminEmailHtml_(data, ref, stamp, receiptFile, agreementFile, signature
     row_('Athlete', athlete.name + ' (' + (athlete.chineseName || '—') + ')') +
     row_('Age / Gender', (athlete.age || '—') + ' · ' + (athlete.gender || '—')) +
     row_('School / Class', (athlete.school || '—') + ' · ' + (athlete.className || '—')) +
-    row_('Parent', parent.name + ' (' + (parent.relationship || 'Guardian') + ')') +
-    row_('NRIC / FIN', parent.ic || '—') +
+    row_('Parent', parent.name + ' (' + (parent.relationshipLabel || parent.relationship || 'Guardian') + ')') +
+    row_('NRIC (MyKad)', parent.ic || '—') +
     row_('Mobile', parent.phone) +
     row_('Email', parent.email) +
     row_('Terms', terms.map((t) => t.label).join(', ') || '—') +
@@ -568,6 +677,7 @@ function adminEmailHtml_(data, ref, stamp, receiptFile, agreementFile, signature
     '</div>';
 
   return emailShell_(
+    EMAIL_COPY.en,
     'New registration',
     athlete.name + ' · ' + money_(data.total) + ' · ' + ref,
     inner

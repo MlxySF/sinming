@@ -1,94 +1,101 @@
 import StepShell from '../components/StepShell';
-import { SegmentedField, TextField } from '../components/Fields';
+import { Field, SegmentedField, TextField } from '../components/Fields';
 import { IdCard, School, User } from '../components/Icons';
-
-const GENDERS = [
-  { value: 'Male', label: 'Male' },
-  { value: 'Female', label: 'Female' },
-  { value: 'Prefer not to say', label: 'Prefer not to say' },
-];
+import { useI18n } from '../i18n';
+import { ageFromIc, formatMyIc } from '../lib/utils';
 
 export default function StepAthlete({ data, update, errors, onNext, onBack }) {
+  const { m } = useI18n();
+  const copy = m.form.athlete;
   const { athlete } = data;
   const set = (key) => (value) => update({ athlete: { ...athlete, [key]: value } });
+
+  const age = ageFromIc(athlete.ic);
+
+  const handleIc = (value) => {
+    const ic = formatMyIc(value);
+    update({ athlete: { ...athlete, ic, age: ageFromIc(ic) } });
+  };
 
   return (
     <StepShell
       index={3}
-      title="Athlete details"
-      description="Tell us about the student joining the programme. This information goes on the signed agreement."
+      title={copy.title}
+      description={copy.description}
       onBack={onBack}
       onNext={onNext}
-      footerHint="Please double-check the spelling of the name."
+      footerHint={copy.footerHint}
     >
       <div className="grid grid--2">
         <TextField
-          label="Full name (as per NRIC / birth certificate)"
+          label={copy.name}
           name="athleteName"
           value={athlete.name}
           onChange={set('name')}
-          placeholder="e.g. Tan Jia Hao"
+          placeholder={copy.namePlaceholder}
           icon={<User size={16} />}
           required
           error={errors.athleteName}
         />
         <TextField
-          label="Chinese name"
+          label={copy.chineseName}
           name="athleteChineseName"
           value={athlete.chineseName}
           onChange={set('chineseName')}
-          placeholder="e.g. 陈家豪"
+          placeholder={copy.chineseNamePlaceholder}
           required
           error={errors.athleteChineseName}
-          hint="Used on competition entry forms and certificates."
+          hint={copy.chineseNameHint}
         />
         <TextField
-          label="NRIC / Birth certificate no."
+          label={copy.ic}
           name="athleteIc"
           value={athlete.ic}
-          onChange={(value) => set('ic')(value.toUpperCase())}
-          placeholder="e.g. T1234567A"
+          onChange={handleIc}
+          placeholder={copy.icPlaceholder}
           icon={<IdCard size={16} />}
+          inputMode="numeric"
           maxLength={14}
           required
           error={errors.athleteIc}
+          hint={copy.icHint}
         />
-        <TextField
-          label="Age"
-          name="athleteAge"
-          value={athlete.age}
-          onChange={set('age')}
-          placeholder="e.g. 9"
-          inputMode="numeric"
-          maxLength={2}
-          required
+        <Field
+          label={copy.ageAuto}
           error={errors.athleteAge}
-          hint="Age as of 1 January of the enrolment year."
-        />
+          hint={age === '' ? copy.ageNote : undefined}
+        >
+          <div className={`derived${age === '' ? ' derived--empty' : ''}`}>
+            {age === '' ? copy.ageEmpty : copy.yearsOld(age)}
+            <span className="derived__badge" aria-hidden="true">
+              NRIC
+            </span>
+          </div>
+        </Field>
         <SegmentedField
-          label="Gender"
+          label={copy.gender}
           value={athlete.gender}
           onChange={set('gender')}
-          options={GENDERS}
+          options={copy.genders}
           required
           error={errors.athleteGender}
         />
         <TextField
-          label="Current school"
+          label={copy.school}
           name="athleteSchool"
           value={athlete.school}
           onChange={set('school')}
-          placeholder="e.g. Ai Tong School"
+          placeholder={copy.schoolPlaceholder}
           icon={<School size={16} />}
           required
           error={errors.athleteSchool}
         />
         <TextField
-          label="Class / level"
-          name="athleteClass"
+          label={copy.className}
+          name="athleteClassName"
           value={athlete.className}
           onChange={set('className')}
-          placeholder="e.g. Primary 4 · Joy"
+          placeholder={copy.classNamePlaceholder}
           required
           error={errors.athleteClassName}
           full

@@ -1,4 +1,5 @@
-import { ACADEMY, AGREEMENT_TERMS, BANK, formatMoney } from '../config';
+import { ACADEMY, BANK, formatMoney } from '../config';
+import en from '../i18n/en';
 import { asciiSafe, todayLong } from './utils';
 
 const PAGE_W = 210;
@@ -6,6 +7,15 @@ const PAGE_H = 297;
 const M = 16;
 const CONTENT_W = PAGE_W - M * 2;
 const BOTTOM = PAGE_H - 22;
+
+const INK = [12, 15, 19];
+const GOLD = [176, 132, 58];
+const CRIMSON = [183, 18, 38];
+const GREY = [104, 109, 118];
+const LINE = [206, 196, 180];
+
+/* The signed document is always issued in English. */
+const L = en.pdf;
 
 /* jsPDF is loaded on demand (~350 kB) so the landing page stays instant. */
 let jsPdfLoader = null;
@@ -30,7 +40,7 @@ async function ensureCjkFont() {
 /**
  * jsPDF's built-in fonts cannot render Chinese characters, so any name that
  * contains CJK text is drawn to an invisible canvas by the browser and placed
- * in the PDF as a small transparent image.
+ * in the PDF as a small image.
  */
 function textImage(text, { sizePx = 72, weight = 600, color = '#14171c' } = {}) {
   if (typeof document === 'undefined' || !text) return null;
@@ -57,12 +67,6 @@ function textImage(text, { sizePx = 72, weight = 600, color = '#14171c' } = {}) 
   }
 }
 
-const INK = [12, 15, 19];
-const GOLD = [176, 132, 58];
-const CRIMSON = [183, 18, 38];
-const GREY = [104, 109, 118];
-const LINE = [206, 196, 180];
-
 /**
  * Builds the signed agreement PDF entirely in the browser.
  * Returns { doc, fileName, base64, dataUrl } so it can be
@@ -83,6 +87,7 @@ export async function buildAgreementPdf({
     `${athlete?.chineseName || ''}${athlete?.name || ''}${parent?.name || ''}`
   );
   if (hasChinese) await ensureCjkFont();
+
   const doc = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
   let y = 0;
 
@@ -113,14 +118,14 @@ export async function buildAgreementPdf({
   doc.setFontSize(7.4);
   doc.setTextColor(...GOLD);
   doc.setCharSpace(0.5);
-  doc.text('STUDENT REGISTRATION & FEE AGREEMENT', M, 36);
+  doc.text(asciiSafe(L.subtitle), M, 36);
 
   // reference block (right side of band)
   doc.setFont('helvetica', 'normal');
   doc.setCharSpace(0.2);
   doc.setFontSize(7.2);
   doc.setTextColor(150, 145, 136);
-  doc.text('REFERENCE', PAGE_W - M, 17, { align: 'right' });
+  doc.text(asciiSafe(L.reference), PAGE_W - M, 17, { align: 'right' });
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
   doc.setTextColor(255, 255, 255);
@@ -128,10 +133,10 @@ export async function buildAgreementPdf({
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.2);
   doc.setTextColor(150, 145, 136);
-  doc.text('DATE', PAGE_W - M, 31, { align: 'right' });
+  doc.text(asciiSafe(L.date), PAGE_W - M, 31, { align: 'right' });
   doc.setFontSize(9);
   doc.setTextColor(235, 230, 222);
-  doc.text(asciiSafe(todayLong(submittedAt)), PAGE_W - M, 37, { align: 'right' });
+  doc.text(asciiSafe(todayLong(submittedAt, 'en-MY')), PAGE_W - M, 37, { align: 'right' });
 
   y = 56;
 
@@ -179,7 +184,7 @@ export async function buildAgreementPdf({
     const raw = String(value || '').trim();
     const hasCjk = /[^\x00-\xFF]/.test(raw);
 
-    // Chinese / mixed names: place a transparent image of the text instead
+    // Chinese / mixed names: place an image of the text instead
     if (hasCjk) {
       const img = textImage(raw, { sizePx: 72, color: '#14171c' });
       if (img) {
@@ -199,35 +204,35 @@ export async function buildAgreementPdf({
   };
 
   /* ------------------------------------------------- 01 parent particulars */
-  sectionTitle('01  Parent / Guardian particulars');
+  sectionTitle(`01  ${L.s1}`);
   const colW = CONTENT_W / 2 - 6;
   let rowY = y;
-  detailRow('Full name (as per NRIC)', parent?.name, M, colW);
-  detailRow('NRIC / FIN', parent?.ic, M + CONTENT_W / 2 + 4, colW);
+  detailRow(L.parentName, parent?.name, M, colW);
+  detailRow(L.parentIc, parent?.ic, M + CONTENT_W / 2 + 4, colW);
   y = rowY + 13;
-  detailRow('Mobile number', parent?.phone, M, colW);
-  detailRow('Email address', parent?.email, M + CONTENT_W / 2 + 4, colW);
+  detailRow(L.parentPhone, parent?.phone, M, colW);
+  detailRow(L.parentEmail, parent?.email, M + CONTENT_W / 2 + 4, colW);
   y += 13;
-  detailRow('Relationship with athlete', parent?.relationship, M, colW);
+  detailRow(L.parentRel, parent?.relationship, M, colW);
   y += 13;
 
   /* ------------------------------------------------ 02 athlete particulars */
-  sectionTitle('02  Athlete particulars');
+  sectionTitle(`02  ${L.s2}`);
   rowY = y;
-  detailRow('Full name', athlete?.name, M, colW);
-  detailRow('Chinese name', athlete?.chineseName || '-', M + CONTENT_W / 2 + 4, colW);
+  detailRow(L.athleteName, athlete?.name, M, colW);
+  detailRow(L.athleteCn, athlete?.chineseName || '-', M + CONTENT_W / 2 + 4, colW);
   y = rowY + 13;
-  detailRow('NRIC / Birth certificate no.', athlete?.ic || '-', M, colW);
-  detailRow('Age', athlete?.age ? `${athlete.age} years old` : '-', M + CONTENT_W / 2 + 4, colW);
+  detailRow(L.athleteIc, athlete?.ic || '-', M, colW);
+  detailRow(L.athleteAge, athlete?.age ? L.yearsOld(athlete.age) : '-', M + CONTENT_W / 2 + 4, colW);
   y += 13;
-  detailRow('Gender', athlete?.gender, M, colW);
-  detailRow('Current school', athlete?.school, M + CONTENT_W / 2 + 4, colW);
+  detailRow(L.athleteGender, athlete?.gender, M, colW);
+  detailRow(L.athleteSchool, athlete?.school, M + CONTENT_W / 2 + 4, colW);
   y += 13;
-  detailRow('Class / level', athlete?.className || '-', M, colW);
+  detailRow(L.athleteClass, athlete?.className || '-', M, colW);
   y += 13;
 
   /* ------------------------------------------------------------- 03 fees */
-  sectionTitle('03  Enrolled programme & fees');
+  sectionTitle(`03  ${L.s3}`);
   ensure(30);
   doc.setFillColor(246, 242, 234);
   doc.rect(M, y - 4.5, CONTENT_W, 8, 'F');
@@ -235,10 +240,10 @@ export async function buildAgreementPdf({
   doc.setFontSize(7);
   doc.setTextColor(...GREY);
   doc.setCharSpace(0.3);
-  doc.text('TERM', M + 3, y);
-  doc.text('PERIOD', M + 52, y);
-  doc.text('SESSIONS', M + 110, y);
-  doc.text('AMOUNT', PAGE_W - M - 3, y, { align: 'right' });
+  doc.text(asciiSafe(L.colTerm), M + 3, y);
+  doc.text(asciiSafe(L.colPeriod), M + 52, y);
+  doc.text(asciiSafe(L.colSessions), M + 110, y);
+  doc.text(asciiSafe(L.colAmount), PAGE_W - M - 3, y, { align: 'right' });
   doc.setCharSpace(0.1);
   y += 9;
 
@@ -254,7 +259,7 @@ export async function buildAgreementPdf({
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...GREY);
     doc.text(asciiSafe(term.period), M + 52, y);
-    doc.text(`${term.sessions} classes`, M + 110, y);
+    doc.text(`${term.sessions} ${asciiSafe(L.classes)}`, M + 110, y);
     doc.setTextColor(...INK);
     doc.text(asciiSafe(formatMoney(term.price)), PAGE_W - M - 3, y, { align: 'right' });
     doc.line(M, y + 3, PAGE_W - M, y + 3);
@@ -268,7 +273,7 @@ export async function buildAgreementPdf({
   doc.setFontSize(8.4);
   doc.setTextColor(235, 230, 222);
   doc.setCharSpace(0.3);
-  doc.text('TOTAL AMOUNT PAYABLE', M + 4, y + 3);
+  doc.text(asciiSafe(L.totalLabel), M + 4, y + 3);
   doc.setFontSize(12);
   doc.setTextColor(243, 215, 154);
   doc.text(asciiSafe(formatMoney(total)), PAGE_W - M - 4, y + 3.2, { align: 'right' });
@@ -276,14 +281,14 @@ export async function buildAgreementPdf({
   y += 15;
 
   para(
-    `Payment to: ${BANK.bankName} · Account name: ${BANK.accountName} · Account no: ${BANK.accountNumber} · PayNow: ${BANK.paynow}. ` +
+    `${L.paymentTo}: ${BANK.bankName} - ${BANK.accountName} - ${BANK.accountNumber} - DuitNow: ${BANK.duitnow}. ` +
       'Fees are payable per month / per term as invoiced, and a payment receipt is to be uploaded with this registration.'
   );
   y += 3;
 
   /* -------------------------------------------------------------- 04 terms */
-  sectionTitle('04  Terms & conditions');
-  AGREEMENT_TERMS.forEach((item, index) => {
+  sectionTitle(`04  ${L.s4}`);
+  en.terms.list.forEach((item, index) => {
     ensure(16);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.7);
@@ -296,13 +301,8 @@ export async function buildAgreementPdf({
 
   /* -------------------------------------------------------- 05 declaration */
   ensure(46);
-  sectionTitle('05  Declaration & signature');
-  para(
-    'I, the parent / guardian named above, confirm that I have read and understood the terms and conditions of ' +
-      `${ACADEMY.name}, that I enrol my child of my own accord, and that I accept responsibility for the payment of ` +
-      'all applicable class fees. I consent to the use of my electronic signature below, which is legally binding and ' +
-      'equivalent to a handwritten signature.'
-  );
+  sectionTitle(`05  ${L.s5}`);
+  para(L.declaration);
   y += 3;
 
   ensure(44);
@@ -329,7 +329,7 @@ export async function buildAgreementPdf({
   doc.setFontSize(6.9);
   doc.setTextColor(...GREY);
   doc.setCharSpace(0.3);
-  doc.text('AUTHORISED SIGNATURE', M, sigBoxTop + 34.5);
+  doc.text(asciiSafe(L.authorisedSignature), M, sigBoxTop + 34.5);
 
   doc.setCharSpace(0.1);
   doc.setFont('helvetica', 'bold');
@@ -341,7 +341,9 @@ export async function buildAgreementPdf({
   doc.setFontSize(7.6);
   doc.setTextColor(...GREY);
   doc.text(
-    asciiSafe(`${parent?.relationship || 'Parent / Guardian'} · ${todayLong(submittedAt)}`),
+    asciiSafe(
+      `${parent?.relationship || 'Parent / Guardian'} · ${todayLong(submittedAt, 'en-MY')}`
+    ),
     M,
     sigBoxTop + 43.5
   );
@@ -353,7 +355,7 @@ export async function buildAgreementPdf({
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.6);
   doc.setTextColor(...GREY);
-  doc.text('For and on behalf of', ax + 5, sigBoxTop + 8);
+  doc.text(asciiSafe(L.forAndOnBehalf), ax + 5, sigBoxTop + 8);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.6);
   doc.setTextColor(...INK);
@@ -361,7 +363,7 @@ export async function buildAgreementPdf({
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.2);
   doc.setTextColor(...GREY);
-  doc.text('Registrar / Admin', ax + 5, sigBoxTop + 19);
+  doc.text(asciiSafe(L.registrar), ax + 5, sigBoxTop + 19);
 
   // red academy seal
   doc.setFillColor(...CRIMSON);
@@ -383,12 +385,8 @@ export async function buildAgreementPdf({
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.8);
     doc.setTextColor(150, 145, 136);
-    doc.text(
-      asciiSafe(`${ACADEMY.name} · UEN ${ACADEMY.uen} · Reference ${ref}`),
-      M,
-      PAGE_H - 11
-    );
-    doc.text(`Page ${page} of ${pages}`, PAGE_W - M, PAGE_H - 11, { align: 'right' });
+    doc.text(asciiSafe(L.footerRef(ACADEMY.name, ACADEMY.companyNo, ref)), M, PAGE_H - 11);
+    doc.text(asciiSafe(L.page(page, pages)), PAGE_W - M, PAGE_H - 11, { align: 'right' });
   }
 
   const base64 = doc.output('datauristring').split(',')[1];

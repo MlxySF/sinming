@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { ACADEMY, formatMoney } from '../config';
 import { ArrowRight, Download, Info } from './Icons';
+import { useI18n } from '../i18n';
 
 const CONFETTI_COLORS = ['#e0b45c', '#f3d79a', '#c8102e', '#e6384c', '#f4efe6'];
 
@@ -22,17 +23,17 @@ function Confetti() {
 
   return (
     <div className="confetti" aria-hidden="true">
-      {pieces.map((p) => (
+      {pieces.map((piece) => (
         <i
-          key={p.id}
+          key={piece.id}
           style={{
-            left: `${p.left}%`,
-            width: p.width,
-            height: p.height,
-            borderRadius: p.radius,
-            background: p.color,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
+            left: `${piece.left}%`,
+            width: piece.width,
+            height: piece.height,
+            borderRadius: piece.radius,
+            background: piece.color,
+            animationDelay: `${piece.delay}s`,
+            animationDuration: `${piece.duration}s`,
           }}
         />
       ))}
@@ -41,11 +42,16 @@ function Confetti() {
 }
 
 export default function Success({ result, onHome, onRegisterAnother }) {
+  const { m } = useI18n();
+  const copy = m.success;
+
   useEffect(() => {
-    document.title = `${ACADEMY.name} — Registration complete`;
-  }, []);
+    document.title = m.meta.successTitle;
+  }, [m]);
 
   if (!result) return null;
+
+  const firstName = (result.athlete?.name || '').split(' ')[0];
 
   return (
     <div className="success">
@@ -56,50 +62,66 @@ export default function Success({ result, onHome, onRegisterAnother }) {
 
       <div className="success__card">
         <div className="success__check">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="34"
+            height="34"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M4.5 12.5 9.5 17.5 19.5 6.5" />
           </svg>
         </div>
 
         <h1>
-          Registration received
-          <em>Welcome to the academy</em>
+          {copy.title}
+          <em>{copy.subtitle}</em>
         </h1>
 
         <p className="success__lead">
-          {result.athlete?.name?.split(' ')[0]}’s place is reserved. A confirmation email with the
-          signed agreement attached is on its way to{' '}
-          <strong style={{ color: '#fff', fontWeight: 600 }}>{result.parent?.email}</strong>.
+          {copy.leadBefore(firstName)}
+          <strong style={{ color: '#fff', fontWeight: 600 }}>{result.parent?.email}</strong>
+          {copy.leadAfter}
         </p>
 
         <div className="success__ref">
-          Reference <b>{result.ref}</b>
+          {copy.reference} <b>{result.ref}</b>
         </div>
 
         <div className="success__summary">
           <div className="success__summary-row">
-            <span>Athlete</span>
+            <span>{copy.rows.athlete}</span>
             <b>{result.athlete?.name}</b>
           </div>
           <div className="success__summary-row">
-            <span>Parent</span>
+            <span>{copy.rows.parent}</span>
             <b>
-              {result.parent?.name} · {result.parent?.relationship}
+              {result.parent?.name} · {result.parent?.relationshipLabel}
             </b>
           </div>
           <div className="success__summary-row">
-            <span>Term(s)</span>
-            <b>{result.terms?.map((t) => t.label).join(', ')}</b>
+            <span>{copy.rows.terms}</span>
+            <b>{result.terms?.map((term) => term.label).join(', ')}</b>
           </div>
           <div className="success__summary-row">
-            <span>Total paid</span>
-            <b style={{ color: '#f3d79a', fontFamily: 'var(--font-display)', fontSize: 17, letterSpacing: '0.02em' }}>
+            <span>{copy.rows.total}</span>
+            <b
+              style={{
+                color: '#f3d79a',
+                fontFamily: 'var(--font-display)',
+                fontSize: 17,
+                letterSpacing: '0.02em',
+              }}
+            >
               {formatMoney(result.total)}
             </b>
           </div>
           <div className="success__summary-row">
-            <span>Receipt</span>
-            <b>{result.receiptFileName || 'Uploaded'}</b>
+            <span>{copy.rows.receipt}</span>
+            <b>{result.receiptFileName || copy.receiptUploaded}</b>
           </div>
         </div>
 
@@ -108,48 +130,54 @@ export default function Success({ result, onHome, onRegisterAnother }) {
             type="button"
             className="btn btn--gold"
             onClick={() => {
-              const a = document.createElement('a');
-              a.href = result.pdfUrl;
-              a.download = result.pdfFileName;
-              document.body.appendChild(a);
-              a.click();
-              a.remove();
+              const link = document.createElement('a');
+              link.href = result.pdfUrl;
+              link.download = result.pdfFileName;
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
             }}
           >
-            <Download size={16} /> Download agreement
+            <Download size={16} /> {copy.download}
           </button>
           <button type="button" className="btn btn--ghost-light" onClick={onHome}>
-            Back to home <span className="btn__arrow"><ArrowRight size={16} /></span>
+            {copy.backHome}
+            <span className="btn__arrow">
+              <ArrowRight size={16} />
+            </span>
           </button>
         </div>
 
         <div className="success__next">
-          <b>What happens next</b>
+          <b>{copy.nextTitle}</b>
           <ol>
-            <li>Our admin verifies your payment receipt — usually within one working day.</li>
-            <li>
-              You will receive a WhatsApp message with the class venue, timing and first-lesson
-              details.
-            </li>
-            <li>Keep the agreement PDF safe — it is your signed copy of the terms.</li>
+            {copy.nextSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ol>
         </div>
 
         {result.demo && (
           <div
             className="alert alert--info"
-            style={{ marginTop: 22, textAlign: 'left', background: 'rgba(224,180,92,0.08)', borderColor: 'rgba(224,180,92,0.28)', color: 'rgba(244,239,230,0.72)' }}
+            style={{
+              marginTop: 22,
+              textAlign: 'left',
+              background: 'rgba(224,180,92,0.08)',
+              borderColor: 'rgba(224,180,92,0.28)',
+              color: 'rgba(244,239,230,0.72)',
+            }}
           >
             <Info size={15} />
             <span>
-              <b>Preview mode:</b> no data was stored and no email was sent. Add your Google Apps
-              Script URL to <code>.env</code> to switch the live connection on.
+              <b>{copy.demoTitle}</b>
+              {copy.demoBody}
             </span>
           </div>
         )}
 
         <p style={{ marginTop: 22, fontSize: 11.5, color: 'rgba(244,239,230,0.4)', lineHeight: 1.6 }}>
-          Didn’t get the email within 10 minutes? Check spam, or write to{' '}
+          {copy.noEmail}
           <a href={`mailto:${ACADEMY.email}`} style={{ color: 'rgba(243,215,154,0.9)' }}>
             {ACADEMY.email}
           </a>
@@ -170,7 +198,7 @@ export default function Success({ result, onHome, onRegisterAnother }) {
             textUnderlineOffset: 4,
           }}
         >
-          Register another athlete
+          {copy.another}
         </button>
       </div>
     </div>

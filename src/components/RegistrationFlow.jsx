@@ -1,15 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ACADEMY, FORM_TOKEN, IS_DEMO_MODE } from '../config';
-import Stepper, { STEPS } from './Stepper';
+import { ACADEMY, FORM_TOKEN, IS_DEMO_MODE, telHref } from '../config';
+import Stepper, { STEP_COUNT } from './Stepper';
 import StepAgreement from '../steps/StepAgreement';
 import StepParent from '../steps/StepParent';
 import StepAthlete from '../steps/StepAthlete';
 import StepPayment from '../steps/StepPayment';
+import LanguageToggle from './LanguageToggle';
 import { buildAgreementPdf } from '../lib/agreement';
 import { submitRegistration } from '../lib/submit';
-import { selectedTermsOf, totalOf } from '../lib/terms';
-import { isEmail, isPhone, makeReference, onlyDigits } from '../lib/utils';
-import { ArrowLeft, Lock, Shield } from './Icons';
+import { termOptionsOf, totalOf } from '../lib/terms';
+import {
+  ageFromIc,
+  isEmail,
+  isValidMyIc,
+  isValidMyPhone,
+  makeReference,
+  phoneIntl,
+} from '../lib/utils';
+import { useI18n } from '../i18n';
+import { ArrowLeft } from './Icons';
 
 const EMPTY_DATA = {
   agreed: false,
@@ -28,14 +37,10 @@ const EMPTY_DATA = {
   receipt: null,
 };
 
-const NAME_RE = /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z\u4e00-\u9fa5 .'’\-/]*$/;
-
+/* Letters (incl. Chinese), spaces, hyphens, apostrophes, slashes, dots. */
+const NAME_RE = /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z\u4e00-\u9fa5 .'\-/]*$/;
 const DRAFT_KEY = 'wsa-registration-draft';
 
-/**
- * Keeps whatever the parent has typed so far in sessionStorage.
- * Files are never stored — they just re-upload the receipt at step 4.
- */
 function loadDraft() {
   try {
     const raw = sessionStorage.getItem(DRAFT_KEY);
@@ -55,12 +60,18 @@ function loadDraft() {
 }
 
 export default function RegistrationFlow({ onComplete, onExit }) {
+  const { m, lang } = useI18n();
+  const copy = m.form;
   const [step, setStep] = useState(0);
   const [data, setData] = useState(() => loadDraft() || EMPTY_DATA);
   const [restored] = useState(() => Boolean(loadDraft()));
   const [errors, setErrors] = useState({});
   const [completed, setCompleted] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+
+  const relationshipLabel =
+    copy.parent.relationships.find((item) => item.value === data.parent.relationship)?.label ||
+    '';
 
   const update = useCallback((patch) => {
     setData((prev) => {
@@ -91,39 +102,38 @@ export default function RegistrationFlow({ onComplete, onExit }) {
 
   const validate = (index) => {
     const next = {};
+    const t = copy.errors;
 
     if (index === 0) {
-      if (!data.agreed) next.agreed = 'Please tick the consent checkbox to continue.';
-      if (!data.signature) next.signature = 'Please sign in the box above.';
+      if (!data.agreed) next.agreed = t.agreed;
+      if (!data.signature) next.signature = t.signature;
     }
 
     if (index === 1) {
       const { name, ic, phone, email, relationship } = data.parent;
-      if (name.trim().length < 3) next.parentName = 'Please enter your full name as per NRIC.';
-      else if (!NAME_RE.test(name.trim())) next.parentName = 'Please use letters only.';
-      if (ic.trim().length < 4) next.parentIc = 'Please enter your NRIC / FIN number.';
-      if (!isPhone(phone)) next.parentPhone = 'Please enter a valid mobile number (at least 8 digits).';
-      if (!isEmail(email)) next.parentEmail = 'Please enter a valid email address.';
-      if (!relationship) next.parentRelationship = 'Please select your relationship with the athlete.';
+      if (name.trim().length < 3) next.parentName = t.parentName;
+      else if (!NAME_RE.test(name.trim())) next.parentName = t.nameLetters;
+      if (!isValidMyIc(ic)) next.parentIc = t.parentIc;
+      if (!isValidMyPhone(phone)) next.parentPhone = t.parentPhone;
+      if (!isEmail(email)) next.parentEmail = t.parentEmail;
+      if (!relationship) next.parentRelationship = t.parentRelationship;
     }
 
     if (index === 2) {
-      const { name, chineseName, ic, age, gender, school, className } = data.athlete;
-      if (name.trim().length < 2) next.athleteName = 'Please enter the athlete’s full name.';
-      else if (!NAME_RE.test(name.trim())) next.athleteName = 'Please use letters only.';
-      if (chineseName.trim().length < 1) next.athleteChineseName = 'Please enter the Chinese name.';
-      if (ic.trim().length < 4) next.athleteIc = 'Please enter the NRIC / birth certificate number.';
-      const ageNum = Number(age);
-      if (!age || Number.isNaN(ageNum) || ageNum < 3 || ageNum > 30)
-        next.athleteAge = 'Please enter an age between 3 and 30.';
-      if (!gender) next.athleteGender = 'Please select a gender.';
-      if (school.trim().length < 2) next.athleteSchool = 'Please enter the current school.';
-      if (className.trim().length < 1) next.athleteClassName = 'Please enter the class / level.';
+      const { name, chineseName, ic, gender, school, className } = data.athlete;
+      if (name.trim().length < 2) next.athleteName = t.athleteName;
+      else if (!NAME_RE.test(name.trim())) next.athleteName = t.nameLetters;
+      if (chineseName.trim().length < 1) next.athleteChineseName = t.athleteChineseName;
+      if (!isValidMyIc(ic)) next.athleteIc = t.athleteIc;
+      else if (ageFromIc(ic) === '') next.athleteAge = t.athleteAge;
+      if (!gender) next.athleteGender = t.athleteGender;
+      if (school.trim().length < 2) next.athleteSchool = t.athleteSchool;
+      if (className.trim().length < 1) next.athleteClassName = t.athleteClass;
     }
 
     if (index === 3) {
-      if (!data.terms.length) next.terms = 'Please select at least one payment term.';
-      if (!data.receipt) next.receipt = 'Please upload your payment receipt.';
+      if (!data.terms.length) next.terms = t.terms;
+      if (!data.receipt) next.receipt = t.receipt;
     }
 
     setErrors(next);
@@ -148,29 +158,29 @@ export default function RegistrationFlow({ onComplete, onExit }) {
       focusFirstError();
       return;
     }
-
-    if (step < STEPS.length - 1) {
+    if (step < STEP_COUNT - 1) {
       goTo(step + 1);
       return;
     }
-
     await submit();
   };
 
   const submit = async () => {
     setSubmitting(true);
     setErrors({});
+
     const reference = makeReference();
     const submittedAt = new Date();
-    const terms = selectedTermsOf(data.terms);
+    const terms = termOptionsOf(data.terms, m, lang);
     const total = totalOf(data.terms);
-    const phone = `+65${onlyDigits(data.parent.phone).replace(/^65/, '')}`;
+    const athleteAge = ageFromIc(data.athlete.ic);
+    const intlPhone = phoneIntl(data.parent.phone);
 
     try {
       const agreement = await buildAgreementPdf({
         ref: reference,
-        parent: data.parent,
-        athlete: data.athlete,
+        parent: { ...data.parent, relationship: relationshipLabel },
+        athlete: { ...data.athlete, age: athleteAge },
         selectedTerms: terms,
         total,
         signature: data.signature,
@@ -180,17 +190,16 @@ export default function RegistrationFlow({ onComplete, onExit }) {
       const result = await submitRegistration({
         action: 'submit',
         token: FORM_TOKEN,
+        lang,
         ref: reference,
         submittedAt: submittedAt.toISOString(),
-        parent: { ...data.parent, phone },
-        athlete: { ...data.athlete, age: Number(data.athlete.age) },
-        terms: terms.map(({ id, label, period, sessions, price }) => ({
-          id,
-          label,
-          period,
-          sessions,
-          price,
-        })),
+        parent: {
+          ...data.parent,
+          relationshipLabel,
+          phoneIntl: intlPhone,
+        },
+        athlete: { ...data.athlete, age: athleteAge },
+        terms,
         total,
         signature: data.signature,
         receipt: data.receipt
@@ -220,8 +229,8 @@ export default function RegistrationFlow({ onComplete, onExit }) {
         ref: result.ref || reference,
         demo: Boolean(result.demo),
         submittedAt,
-        parent: { ...data.parent, phone },
-        athlete: { ...data.athlete, age: Number(data.athlete.age) },
+        parent: { ...data.parent, phoneIntl: intlPhone, relationshipLabel },
+        athlete: { ...data.athlete, age: athleteAge },
         terms,
         total,
         pdfUrl,
@@ -229,7 +238,7 @@ export default function RegistrationFlow({ onComplete, onExit }) {
         receiptFileName: data.receipt?.fileName || '',
       });
     } catch (error) {
-      setErrors({ submit: error.message || 'Something went wrong. Please try again.' });
+      setErrors({ submit: error.message || copy.errors.submit });
       focusFirstError();
     } finally {
       setSubmitting(false);
@@ -248,22 +257,23 @@ export default function RegistrationFlow({ onComplete, onExit }) {
   }, [data]);
 
   useEffect(() => {
-    document.title = `${ACADEMY.name} — Registration`;
-    return () => {
-      document.title = `${ACADEMY.name} — 2027 Student Registration`;
-    };
-  }, []);
+    document.title = m.meta.formTitle;
+  }, [m]);
 
   return (
     <div className="shell">
       <header className="shell__header">
         <div className="shell__header-inner">
           <button type="button" className="shell__back" onClick={onExit}>
-            <ArrowLeft size={15} /> Back to home
+            <ArrowLeft size={15} /> {copy.backToHome}
           </button>
 
           <div className="brand" aria-label={ACADEMY.name}>
-            <span className="brand__seal" style={{ width: 36, height: 36, fontSize: 19 }} aria-hidden="true">
+            <span
+              className="brand__seal"
+              style={{ width: 36, height: 36, fontSize: 19 }}
+              aria-hidden="true"
+            >
               武
             </span>
             <span className="brand__text">
@@ -271,37 +281,22 @@ export default function RegistrationFlow({ onComplete, onExit }) {
                 {ACADEMY.name}
               </span>
               <span className="brand__sub" style={{ fontSize: 9 }}>
-                Student registration
+                {m.brand.sub}
               </span>
             </span>
           </div>
 
-          {IS_DEMO_MODE ? (
-            <span className="shell__secure shell__secure--demo">
-              <span className="shell__dot" /> Preview · not connected
-            </span>
-          ) : (
-            <span className="shell__secure">
-              <Lock size={12} /> Secure form
-            </span>
-          )}
+          <LanguageToggle compact />
         </div>
       </header>
 
       <main className="shell__main">
         <div className="form-intro">
-          <span className="eyebrow eyebrow--dark">
-            <Shield size={13} /> 2027 Intake
-          </span>
-          <h1>Student registration</h1>
-          <p>
-            Four short steps: sign the agreement, tell us about the parent and athlete, then choose
-            your term(s) and upload your payment receipt.
-          </p>
+          <span className="eyebrow eyebrow--dark">{copy.eyebrow}</span>
+          <h1>{copy.title}</h1>
+          <p>{copy.intro}</p>
           {restored && (
-            <p style={{ marginTop: 8, fontSize: 12, color: '#1c7c4a' }}>
-              ✓ We restored your draft from this visit — please re-upload your receipt at step 4.
-            </p>
+            <p style={{ marginTop: 8, fontSize: 12, color: '#1c7c4a' }}>✓ {copy.restored}</p>
           )}
         </div>
 
@@ -350,14 +345,13 @@ export default function RegistrationFlow({ onComplete, onExit }) {
         )}
 
         <div className="form-footer">
+          <span>{copy.footerRights(new Date().getFullYear(), ACADEMY.name, ACADEMY.companyNo)}</span>
           <span>
-            © {new Date().getFullYear()} {ACADEMY.name} · UEN {ACADEMY.uen}
-          </span>
-          <span>
-            Need help? <a href={`mailto:${ACADEMY.email}`}>{ACADEMY.email}</a> ·{' '}
-            <a href={`tel:${ACADEMY.phone.replace(/\s/g, '')}`}>{ACADEMY.phone}</a>
+            {copy.needHelp} <a href={`mailto:${ACADEMY.email}`}>{ACADEMY.email}</a> ·{' '}
+            <a href={`tel:${telHref(ACADEMY.phone)}`}>{ACADEMY.phone}</a>
           </span>
         </div>
+        {IS_DEMO_MODE && <p className="form-footer form-footer--demo">{copy.previewNote}</p>}
       </main>
     </div>
   );

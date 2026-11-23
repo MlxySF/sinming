@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import {
-  ACADEMY,
-  LANDING,
-  PAYMENT_TERMS,
-  formatMoney,
-  AGREEMENT_TERMS,
-} from '../config';
-import { ArrowRight, Check, Lock } from './Icons';
+import { ACADEMY, formatMoney, telHref } from '../config';
+import { useI18n } from '../i18n';
+import { allTermOptions } from '../lib/terms';
+import { ArrowRight, Check } from './Icons';
+import LanguageToggle from './LanguageToggle';
 import heroImage from '../assets/hero-wushu.jpg';
 
-function FeeDialog({ open, onClose, onRegister }) {
+function FeeDialog({ open, onClose, onStart }) {
+  const { m, lang } = useI18n();
+  const terms = allTermOptions(m, lang);
+  const { fees } = m;
+
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (e) => e.key === 'Escape' && onClose();
+    const onKey = (event) => event.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -25,111 +26,39 @@ function FeeDialog({ open, onClose, onRegister }) {
   if (!open) return null;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="2027 term fees"
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 90,
-        display: 'grid',
-        placeItems: 'center',
-        padding: 20,
-        background: 'rgba(4,5,7,0.78)',
-        backdropFilter: 'blur(8px)',
-        animation: 'cardIn .25s ease both',
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: 'min(560px, 100%)',
-          maxHeight: '86vh',
-          overflowY: 'auto',
-          padding: '32px 30px 28px',
-          borderRadius: 26,
-          border: '1px solid rgba(255,255,255,0.12)',
-          background: 'linear-gradient(165deg, #14181f, #0a0c10)',
-          boxShadow: '0 40px 90px -40px #000',
-          color: 'var(--text-on-dark)',
-        }}
-      >
-        <span className="eyebrow">2027 Season</span>
-        <h2
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontWeight: 400,
-            fontSize: 30,
-            textTransform: 'uppercase',
-            margin: '12px 0 6px',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          Term fees
-        </h2>
-        <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-on-dark-soft)', lineHeight: 1.6 }}>
-          Fees are billed per month and payable at the start of each month. Tick one or more terms
-          during registration — the total is calculated for you.
-        </p>
+    <div className="dialog" role="dialog" aria-modal="true" aria-label={fees.title} onClick={onClose}>
+      <div className="dialog__panel" onClick={(event) => event.stopPropagation()}>
+        <span className="eyebrow">{fees.eyebrow}</span>
+        <h2 className="dialog__title">{fees.title}</h2>
+        <p className="dialog__intro">{fees.intro}</p>
 
-        <div style={{ display: 'grid', gap: 10 }}>
-          {PAYMENT_TERMS.map((term) => (
-            <div
-              key={term.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 14,
-                padding: '13px 16px',
-                borderRadius: 14,
-                border: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(255,255,255,0.035)',
-              }}
-            >
+        <div className="dialog__terms">
+          {terms.map((term) => (
+            <div className="dialog__term" key={term.id}>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 600 }}>{term.label}</div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-on-dark-soft)', marginTop: 2 }}>
-                  {term.period} · {term.sessions} classes
+                <div className="dialog__term-name">{term.label}</div>
+                <div className="dialog__term-meta">
+                  {term.period} · {fees.classesCount(term.sessions)}
                 </div>
               </div>
-              <div
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 20,
-                  color: 'var(--gold-soft)',
-                }}
-              >
-                {formatMoney(term.price)}
-              </div>
+              <div className="dialog__term-price">{formatMoney(term.price)}</div>
             </div>
           ))}
         </div>
 
-        <div
-          style={{
-            marginTop: 20,
-            padding: '14px 16px',
-            borderRadius: 14,
-            border: '1px solid rgba(255,255,255,0.08)',
-            background: 'rgba(255,255,255,0.03)',
-            fontSize: 12,
-            lineHeight: 1.65,
-            color: 'var(--text-on-dark-soft)',
-          }}
-        >
-          <b style={{ color: 'var(--gold-soft)', fontWeight: 600 }}>Good to know:</b>{' '}
-          {AGREEMENT_TERMS[2].body}
+        <div className="dialog__note">
+          <b>{fees.goodToKnow}</b> {fees.note}
         </div>
 
-        <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button type="button" className="btn btn--gold" onClick={onRegister} style={{ flex: 1 }}>
-            Register now <span className="btn__arrow"><ArrowRight size={16} /></span>
+        <div className="dialog__actions">
+          <button type="button" className="btn btn--gold" onClick={onStart}>
+            {fees.cta}
+            <span className="btn__arrow">
+              <ArrowRight size={16} />
+            </span>
           </button>
           <button type="button" className="btn btn--ghost-light" onClick={onClose}>
-            Close
+            {fees.close}
           </button>
         </div>
       </div>
@@ -138,8 +67,12 @@ function FeeDialog({ open, onClose, onRegister }) {
 }
 
 export default function Landing({ onStart }) {
+  const { m, lang } = useI18n();
   const [feeOpen, setFeeOpen] = useState(false);
-  const featured = PAYMENT_TERMS[0];
+
+  useEffect(() => {
+    document.title = m.meta.title;
+  }, [m]);
 
   return (
     <div className="landing dark-ui">
@@ -151,7 +84,7 @@ export default function Landing({ onStart }) {
       <div className="landing__scrim" aria-hidden="true" />
       <div className="landing__grain" aria-hidden="true" />
       <div className="landing__watermark" aria-hidden="true">
-        武
+        {m.hero.watermark}
       </div>
 
       <header className="nav">
@@ -161,45 +94,32 @@ export default function Landing({ onStart }) {
           </span>
           <span className="brand__text">
             <span className="brand__name">{ACADEMY.name}</span>
-            <span className="brand__sub">Martial Arts · Singapore</span>
+            <span className="brand__sub">{m.brand.sub}</span>
           </span>
         </div>
 
-        <nav className="nav__links" aria-label="Main">
-          <button type="button" className="nav__link" onClick={() => setFeeOpen(true)}>
-            Fees
-          </button>
-          <a className="nav__link" href={`mailto:${ACADEMY.email}`}>
-            Contact
-          </a>
-          <a className="nav__link" href={`tel:${ACADEMY.phone.replace(/\s/g, '')}`}>
-            {ACADEMY.phone}
-          </a>
-          <button type="button" className="btn nav__cta" onClick={onStart}>
-            Register
-          </button>
-        </nav>
+        <LanguageToggle />
       </header>
 
       <main className="hero">
-        <div className="hero__inner">
+        <div className="hero__inner" key={lang}>
           <div className="hero__badge reveal">
             <span className="hero__dot" />
-            {LANDING.intake}
+            {m.hero.intake}
           </div>
 
           <h1 className="hero__title reveal reveal-2">
-            <span>{LANDING.headlineTop}</span>
-            <em>{LANDING.headlineAccent}</em>
+            <span>{m.hero.headlineTop}</span>
+            <em>{m.hero.headlineAccent}</em>
           </h1>
 
           <span className="hero__rule reveal reveal-3" aria-hidden="true" />
 
-          <p className="hero__sub reveal reveal-3">{LANDING.subhead}</p>
+          <p className="hero__sub reveal reveal-3">{m.hero.subhead}</p>
 
           <div className="hero__actions reveal reveal-4">
             <button type="button" className="btn btn--lg" onClick={onStart}>
-              Start registration
+              {m.hero.start}
               <span className="btn__arrow">
                 <ArrowRight size={18} />
               </span>
@@ -209,69 +129,28 @@ export default function Landing({ onStart }) {
               className="btn btn--ghost-light btn--lg"
               onClick={() => setFeeOpen(true)}
             >
-              View 2027 fees
+              {m.hero.viewFees}
             </button>
           </div>
 
           <ul className="hero__highlights reveal reveal-5">
-            {LANDING.highlights.map((item) => (
+            {m.hero.highlights.map((item) => (
               <li key={item}>
                 <Check size={13} /> {item}
               </li>
             ))}
           </ul>
         </div>
-
-        <aside className="hero__card reveal reveal-6" aria-label="Fee summary">
-          <div className="hero__card-label">Term fees from</div>
-          <div className="hero__card-price">
-            {formatMoney(featured.price)} <small>/ term</small>
-          </div>
-          <div className="hero__card-divider" />
-          <div className="hero__card-row">
-            <span>{featured.label}</span>
-            <b>{featured.sessions} classes</b>
-          </div>
-          <div className="hero__card-row">
-            <span>Sign-up time</span>
-            <b>~4 minutes</b>
-          </div>
-          <div className="hero__card-row">
-            <span>Contract</span>
-            <b>Signed online</b>
-          </div>
-          <div className="hero__card-divider" />
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 10.5,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'rgba(244,239,230,0.55)',
-            }}
-          >
-            <Lock size={12} /> Secure registration
-          </div>
-        </aside>
       </main>
 
-      <footer className="hero__stats">
-        <div className="hero__stats-inner">
-          {LANDING.stats.map((stat) => (
-            <div className="stat" key={stat.label}>
-              <span className="stat__value">{stat.value}</span>
-              <span className="stat__label">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </footer>
+      <a className="hero__contact" href={`tel:${telHref(ACADEMY.phone)}`}>
+        {ACADEMY.phone}
+      </a>
 
       <FeeDialog
         open={feeOpen}
         onClose={() => setFeeOpen(false)}
-        onRegister={() => {
+        onStart={() => {
           setFeeOpen(false);
           onStart();
         }}

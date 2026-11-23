@@ -39,16 +39,19 @@ const CONFIG = {
   ADMIN_EMAILS: 'admin@wushusportacademy.com',     // ← your email
   ACADEMY_NAME: 'Wushu Sport Academy',
   ACADEMY_EMAIL: 'admin@wushusportacademy.com',
-  ACADEMY_PHONE: '+65 8123 4567',
-  ACADEMY_ADDRESS: '12 Sin Ming Lane, #04-08, Singapore 573968',
-  ACADEMY_UEN: '202312345A',
-  BANK_BANK_NAME: 'DBS Bank (Singapore)',
-  BANK_ACCOUNT_NAME: 'Wushu Sport Academy Pte Ltd',
-  BANK_ACCOUNT_NO: '012-345678-9',
-  BANK_PAYNOW: 'UEN 202312345A',
+  ACADEMY_PHONE: '019-219 1688',
+  ACADEMY_ADDRESS: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
+  ACADEMY_COMPANY_NO: '202301234567',
+
+  BANK_BANK_NAME: 'Maybank',
+  BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',
+  BANK_ACCOUNT_NO: '5123 4567 8901',
+  BANK_DUITNOW: '019-219 1688',
+
+  SHARED_TOKEN: '',          // optional — must match VITE_FORM_TOKEN
   SEND_PARENT_EMAIL: true,
   SEND_ADMIN_EMAIL: true,
-  TIMEZONE: 'Asia/Singapore',
+  TIMEZONE: 'Asia/Kuala_Lumpur',
 };
 ```
 
@@ -126,7 +129,7 @@ re-upload.
 | Parent Name / NRIC / Mobile / Email / Relationship | … |
 | Athlete Name / Chinese Name / NRIC / Age / Gender / School / Class | … |
 | Terms | Term 1 · 2027 (4 Jan – 28 Mar 2027) \| Term 2 · 2027 (…) |
-| Total Due (SGD) | 480 |
+| Total Due (RM) | 480 |
 | Receipt File / Receipt Link | `WSA-…-receipt.jpg` + Drive link |
 | Agreement File / Agreement Link | `WSA-…-Registration-Agreement.pdf` + Drive link |
 | Signature Link | Drive link to the signature PNG |
@@ -141,6 +144,8 @@ Change **Status** to `Confirmed` once you have verified the bank transfer.
 - The Drive folder is link-shared (view only) so the email links open for you.
 - Check the sheet once a day; it is your enrolment ledger.
 - Free Gmail accounts can send ~100 emails/day through Apps Script (plenty).
+- The parent confirmation email is sent in the language the parent used on the
+  form (English or Chinese) — the signed PDF agreement is always in English.
 
 ## Troubleshooting
 

@@ -1,14 +1,16 @@
 import { useMemo, useRef, useState } from 'react';
-import { BANK, PAYMENT_TERMS, formatMoney } from '../config';
+import { BANK, formatMoney } from '../config';
 import StepShell from '../components/StepShell';
 import { Alert, Bank, Check, Close, Copy, Info, Lock, Upload } from '../components/Icons';
 import { compressImage, cx, formatBytes, readFileAsDataUrl } from '../lib/utils';
-import { selectedTermsOf, totalOf } from '../lib/terms';
+import { allTermOptions, totalOf } from '../lib/terms';
+import { useI18n } from '../i18n';
 
 const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
 const MAX_PDF_BYTES = 4 * 1024 * 1024;
 
 function CopyRow({ label, value, mono }) {
+  const { m } = useI18n();
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -35,8 +37,8 @@ function CopyRow({ label, value, mono }) {
           type="button"
           className="copy-btn"
           onClick={copy}
-          aria-label={`Copy ${label}`}
-          title={copied ? 'Copied' : 'Copy'}
+          aria-label={m.form.payment.copy(label)}
+          title={copied ? m.form.payment.copied : m.form.payment.copy(label)}
         >
           {copied ? <Check size={12} /> : <Copy size={12} />}
         </button>
@@ -45,49 +47,44 @@ function CopyRow({ label, value, mono }) {
   );
 }
 
-export default function StepPayment({
-  data,
-  update,
-  errors,
-  onNext,
-  onBack,
-  submitting,
-  onReceiptError,
-}) {
+export default function StepPayment({ data, update, errors, onNext, onBack, submitting }) {
+  const { m, lang } = useI18n();
+  const copy = m.form.payment;
+  const errorsCopy = m.form.errors;
   const [dragActive, setDragActive] = useState(false);
   const [fileError, setFileError] = useState('');
   const [processing, setProcessing] = useState(false);
   const inputRef = useRef(null);
 
-  const selected = selectedTermsOf(data.terms);
+  const terms = allTermOptions(m, lang);
+  const selected = terms.filter((term) => data.terms.includes(term.id));
   const total = totalOf(data.terms);
   const receipt = data.receipt;
 
   const toggleTerm = (id) => {
     const next = data.terms.includes(id)
-      ? data.terms.filter((t) => t !== id)
+      ? data.terms.filter((term) => term !== id)
       : [...data.terms, id];
     update({ terms: next });
   };
 
   const handleFile = async (file) => {
     setFileError('');
-    onReceiptError?.('');
     if (!file) return;
 
     const isPdf = file.type === 'application/pdf';
     const isImage = file.type.startsWith('image/');
 
     if (!isPdf && !isImage) {
-      setFileError('Please upload an image (JPG, PNG, HEIC) or a PDF of your payment receipt.');
+      setFileError(errorsCopy.receiptType);
       return;
     }
     if (isImage && file.size > MAX_IMAGE_BYTES) {
-      setFileError('That image is larger than 12 MB. Please upload a smaller screenshot.');
+      setFileError(errorsCopy.fileTooLarge(12));
       return;
     }
     if (isPdf && file.size > MAX_PDF_BYTES) {
-      setFileError('That PDF is larger than 4 MB. Please upload a smaller file.');
+      setFileError(errorsCopy.fileTooLarge(4));
       return;
     }
 
@@ -119,37 +116,38 @@ export default function StepPayment({
         });
       }
     } catch (error) {
-      setFileError(error.message || 'That file could not be read. Please try another one.');
+      setFileError(errorsCopy.fileUnreadable);
     } finally {
       setProcessing(false);
     }
   };
 
   const summary = useMemo(() => {
-    if (!selected.length) return 'No term selected yet';
-    return `${selected.length} term${selected.length > 1 ? 's' : ''} · ${selected.reduce(
-      (n, t) => n + t.sessions,
-      0
-    )} classes`;
-  }, [selected]);
+    if (!selected.length) return copy.noneSelected;
+    return copy.summary(
+      selected.length,
+      selected.reduce((sum, term) => sum + term.sessions, 0)
+    );
+  }, [selected, copy]);
 
   return (
     <StepShell
       index={4}
-      title="Payment & receipt"
-      description="Select every term you are enrolling for. The amount due is added up automatically, then transfer and upload your receipt."
+      title={copy.title}
+      description={copy.description}
       onBack={onBack}
       onNext={onNext}
-      nextLabel="Submit registration"
+      nextLabel={m.form.submit}
       nextLoading={submitting}
-      footerHint="You will receive a confirmation email with your agreement attached."
+      isSubmit
+      footerHint={copy.footerHint}
     >
       <div className="section-label">
-        Select payment term(s) <span className="section-label__count">{summary}</span>
+        {copy.selectTerms} <span className="section-label__count">{summary}</span>
       </div>
 
       <div className="terms-grid">
-        {PAYMENT_TERMS.map((term) => {
+        {terms.map((term) => {
           const on = data.terms.includes(term.id);
           return (
             <button
@@ -170,7 +168,9 @@ export default function StepPayment({
               </div>
               <div className="term-card__bottom">
                 <span className="term-card__price">{formatMoney(term.price)}</span>
-                <span className="term-card__sessions">{term.sessions} classes</span>
+                <span className="term-card__sessions">
+                  {term.sessions} {m.fees.classes}
+                </span>
               </div>
             </button>
           );
@@ -181,33 +181,37 @@ export default function StepPayment({
       <div className="bank">
         <div className="bank__head">
           <span className="bank__title">
-            <Bank size={15} /> Bank transfer details
+            <Bank size={15} /> {copy.bankTitle}
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(244,239,230,0.45)' }}>
-            <Lock size={11} /> Verified
+          <span className="bank__chip">
+            <Lock size={11} /> {copy.bankVerified}
           </span>
         </div>
         <div className="bank__rows">
-          <CopyRow label="Bank" value={BANK.bankName} />
-          <CopyRow label="Account name" value={BANK.accountName} />
-          <CopyRow label="Account number" value={BANK.accountNumber} mono />
-          <CopyRow label="PayNow" value={BANK.paynow} mono />
+          <CopyRow label={copy.labels.bank} value={BANK.bankName} />
+          <CopyRow label={copy.labels.accountName} value={BANK.accountName} />
+          <CopyRow label={copy.labels.accountNumber} value={BANK.accountNumber} mono />
+          <CopyRow label={copy.labels.duitnow} value={BANK.duitnow} mono />
         </div>
         <div className="bank__total">
           <div className="bank__total-label">
-            Total amount due
-            <small>{selected.length ? selected.map((t) => t.label).join(' + ') : 'Select at least one term'}</small>
+            {copy.totalDue}
+            <small>
+              {selected.length
+                ? selected.map((term) => term.label).join(' + ')
+                : copy.selectAtLeastOne}
+            </small>
           </div>
           <div className="bank__total-amount">{formatMoney(total)}</div>
         </div>
       </div>
 
       <div className="section-label" style={{ marginTop: 28 }}>
-        Upload payment receipt <span className="section-label__count">Required</span>
+        {copy.receipt} <span className="section-label__count">{copy.required}</span>
       </div>
 
       <p style={{ margin: '0 0 14px', fontSize: 12.5, lineHeight: 1.6, color: 'var(--text-soft)' }}>
-        {BANK.instructions}
+        {copy.bankInstructions}
       </p>
 
       {receipt ? (
@@ -215,12 +219,12 @@ export default function StepPayment({
           {receipt.isPdf ? (
             <div className="upload__thumb upload__thumb--pdf">PDF</div>
           ) : (
-            <img className="upload__thumb" src={receipt.previewUrl} alt="Receipt preview" />
+            <img className="upload__thumb" src={receipt.previewUrl} alt={copy.receiptPreview} />
           )}
           <div className="upload__file">
             <div className="upload__file-name">{receipt.fileName}</div>
             <div className="upload__file-meta">
-              {formatBytes(receipt.size)} · Uploaded and ready
+              {formatBytes(receipt.size)} · {copy.uploadedReady}
             </div>
           </div>
           <button
@@ -231,7 +235,7 @@ export default function StepPayment({
               setFileError('');
               if (inputRef.current) inputRef.current.value = '';
             }}
-            aria-label="Remove receipt"
+            aria-label={copy.removeReceipt}
           >
             <Close size={13} />
           </button>
@@ -243,32 +247,28 @@ export default function StepPayment({
             dragActive && 'upload--drag',
             (errors.receipt || fileError) && 'upload--error'
           )}
-          onDragOver={(e) => {
-            e.preventDefault();
+          onDragOver={(event) => {
+            event.preventDefault();
             setDragActive(true);
           }}
           onDragLeave={() => setDragActive(false)}
-          onDrop={(e) => {
-            e.preventDefault();
+          onDrop={(event) => {
+            event.preventDefault();
             setDragActive(false);
-            handleFile(e.dataTransfer.files?.[0]);
+            handleFile(event.dataTransfer.files?.[0]);
           }}
         >
           <span className="upload__icon">
             <Upload size={19} />
           </span>
-          <span className="upload__title">
-            {processing ? 'Processing your receipt…' : 'Tap to upload, or drag your file here'}
-          </span>
-          <span className="upload__hint">
-            Screenshot or photo of your transfer confirmation · JPG, PNG or PDF · max 12 MB
-          </span>
+          <span className="upload__title">{processing ? copy.processing : copy.uploadTitle}</span>
+          <span className="upload__hint">{copy.uploadHint}</span>
           <input
             ref={inputRef}
             type="file"
             accept="image/*,application/pdf"
-            onChange={(e) => handleFile(e.target.files?.[0])}
-            aria-label="Upload payment receipt"
+            onChange={(event) => handleFile(event.target.files?.[0])}
+            aria-label={copy.receipt}
           />
         </label>
       )}
@@ -282,11 +282,7 @@ export default function StepPayment({
       <div className="submit-area">
         <div className="alert alert--info" style={{ marginTop: 0 }}>
           <Info size={15} />
-          <span>
-            When you press <b>Submit registration</b>, we save your details to our enrolment records,
-            generate your signed agreement PDF and email a copy to you. Our admin team verifies your
-            receipt within one working day.
-          </span>
+          <span>{copy.submitAlert}</span>
         </div>
         {errors.submit && (
           <div className="alert">
@@ -295,8 +291,7 @@ export default function StepPayment({
           </div>
         )}
         <p className="submit-note">
-          <Lock size={13} /> Your information and receipt are sent over a secure connection and are
-          only accessible to {BANK.accountName.replace(' Pte Ltd', '')} staff.
+          <Lock size={13} /> {copy.submitNote}
         </p>
       </div>
     </StepShell>

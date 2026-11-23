@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cx } from '../lib/utils';
 import { exportSignature } from '../lib/signature';
+import { useI18n } from '../i18n';
 import { Check, Pen } from './Icons';
 
 /**
@@ -9,6 +10,8 @@ import { Check, Pen } from './Icons';
  * has the latest cropped PNG of the signature.
  */
 export default function SignaturePad({ onChange, error, signedName = '' }) {
+  const { m } = useI18n();
+  const copy = m.form.signature;
   const canvasRef = useRef(null);
   const strokesRef = useRef([]);
   const activeStroke = useRef(null);
@@ -128,14 +131,23 @@ export default function SignaturePad({ onChange, error, signedName = '' }) {
       <div className="signature__head">
         <span className="signature__label">
           <Pen size={14} />
-          Digital signature {signedName ? <em style={{ fontStyle: 'normal', opacity: 0.7 }}>({signedName})</em> : null}
+          {copy.label}
+          {signedName ? (
+            <em style={{ fontStyle: 'normal', opacity: 0.7 }}>({signedName})</em>
+          ) : null}
         </span>
         <div className="signature__tools">
           <span className={cx('signature__status', !isEmpty && 'signature__status--ok')}>
-            {isEmpty ? 'Awaiting signature' : (<><Check size={12} /> Signed</>)}
+            {isEmpty ? (
+              copy.awaiting
+            ) : (
+              <>
+                <Check size={12} /> {copy.signed}
+              </>
+            )}
           </span>
           <button type="button" className="signature__clear" onClick={clear} disabled={isEmpty}>
-            Clear
+            {copy.clear}
           </button>
         </div>
       </div>
@@ -155,24 +167,23 @@ export default function SignaturePad({ onChange, error, signedName = '' }) {
           onPointerMove={handlePointerMove}
           onPointerUp={finishStroke}
           onPointerCancel={finishStroke}
-          onPointerLeave={(e) => {
+          onPointerLeave={() => {
             if (activeStroke.current) finishStroke();
-            void e;
           }}
           role="img"
-          aria-label="Signature pad — draw your signature here"
+          aria-label={copy.placeholder}
         />
         {isEmpty && (
           <div className="signature__placeholder">
-            Sign here with your mouse or finger
-            <small>Use your full name as per NRIC</small>
+            {copy.placeholder}
+            <small>{copy.placeholderHint}</small>
           </div>
         )}
         <div className="signature__baseline" aria-hidden="true" />
       </div>
 
       <div className="signature__meta">
-        <span>Your signature is converted to an image and attached to the agreement PDF.</span>
+        <span>{copy.note}</span>
         {error && <span className="field__error">{error}</span>}
       </div>
     </div>

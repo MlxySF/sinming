@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, Lock } from './Icons';
+import { useI18n } from '../i18n';
 
 export default function StepShell({
   index,
@@ -7,13 +8,16 @@ export default function StepShell({
   children,
   onBack,
   onNext,
-  nextLabel = 'Continue',
-  backLabel = 'Back',
+  nextLabel,
+  backLabel,
   nextDisabled = false,
   nextLoading = false,
   footerHint,
   showBack = true,
+  isSubmit = false,
 }) {
+  const { m } = useI18n();
+
   return (
     <section className="card">
       <header className="card__head">
@@ -30,8 +34,13 @@ export default function StepShell({
         {footerHint ? <span className="card__foot-hint">{footerHint}</span> : <span />}
         <div className="card__foot-actions">
           {showBack && (
-            <button type="button" className="btn btn--outline" onClick={onBack} disabled={nextLoading}>
-              <ArrowLeft size={16} /> {backLabel}
+            <button
+              type="button"
+              className="btn btn--outline"
+              onClick={onBack}
+              disabled={nextLoading}
+            >
+              <ArrowLeft size={16} /> {backLabel || m.form.back}
             </button>
           )}
           <button
@@ -42,12 +51,18 @@ export default function StepShell({
           >
             {nextLoading ? (
               <>
-                <span className="spinner" /> Submitting…
+                <span className="spinner" /> {m.form.submitting}
               </>
             ) : (
               <>
-                {nextLabel}
-                {index === 4 ? <Lock size={15} /> : <span className="btn__arrow"><ArrowRight size={17} /></span>}
+                {nextLabel || m.form.continue}
+                {isSubmit ? (
+                  <Lock size={15} />
+                ) : (
+                  <span className="btn__arrow">
+                    <ArrowRight size={17} />
+                  </span>
+                )}
               </>
             )}
           </button>

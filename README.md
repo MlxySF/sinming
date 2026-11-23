@@ -1,6 +1,6 @@
 # Wushu Sport Academy — Registration Website
 
-A full-screen landing page plus a 4-step registration form built with **React + Vite**.
+A bilingual (English / 中文) full-screen landing page plus a 4-step registration form built with **React + Vite**, made for a Malaysian wushu academy.
 Submissions land in a **Google Sheet**, files (signature, receipt, signed agreement PDF) go
 to a **Google Drive folder**, and the parent automatically receives a **styled confirmation
 email** with their agreement attached.
@@ -12,8 +12,10 @@ No backend server, no database, no monthly fee — Google Apps Script does the w
 ## What is inside
 
 **1 · Landing page** (`/`)
-Full-viewport hero with the academy branding, hero photography, live term-fee card and a
-*Start registration* button that opens the form.
+Full-viewport hero with the academy branding, hero photography, a fee dialog and a
+*Start registration* button that opens the form. The header holds a single control: the
+**EN / 中文** switch — the entire site (landing, form, validation messages, success page)
+switches language instantly and remembers the choice.
 
 **2 · Step 1 — Agreement** (`#register`)
 Terms & conditions covering fees, sudden schedule changes for competitions / performances /
@@ -22,14 +24,16 @@ consent, **signs with a mouse or finger on a canvas**, and the app turns that si
 a cropped PNG, then builds a **signed PDF agreement** in the browser.
 
 **3 · Step 2 — Parent details**
-Name, NRIC/FIN, mobile, email and relationship with the athlete.
+Name, MyKad NRIC (auto-formatted `900101-14-5678`), Malaysian mobile
+(auto-formatted `012-345 6789` / `011-2345 6789`), email and relationship with the athlete.
 
 **4 · Step 3 — Athlete details**
-English name, Chinese name, NRIC/birth certificate, age, gender, school and class.
+English name, Chinese name, MyKad NRIC, gender, school and class. **Age is calculated
+automatically from the birth year inside the NRIC** (month and day are ignored).
 
 **5 · Step 4 — Payment**
-Multi-select term checkboxes (dates + price each) that add up into a total due, the bank /
-PayNow details with copy buttons, and a drag-and-drop **receipt upload**.
+Multi-select term checkboxes (dates + price each) that add up into a total due (RM), the
+bank / DuitNow details with copy buttons, and a drag-and-drop **receipt upload**.
 
 **6 · Submit**
 Writes a row to the Google Sheet → saves the three files to Drive → emails the parent (HTML
@@ -75,12 +79,17 @@ GitHub Pages, plus a go-live checklist and troubleshooting.
 
 | Export | What it controls |
 | --- | --- |
-| `ACADEMY` | Name, email, phone, address, UEN (used on the site, the PDF and in emails) |
-| `BANK` | Bank name, account name/number, PayNow, upload instructions |
-| `PAYMENT_TERMS` | The term checkboxes — label, period, sessions, price |
-| `AGREEMENT_TERMS` | The 5 clauses shown in step 1 and printed in the PDF |
-| `LANDING` | Headline, sub-headline, stats and highlights on the hero |
-| `formatMoney` | Currency formatting (`S$`) |
+| `ACADEMY` | Name, email, phone, address, SSM/company number (site, PDF and emails) |
+| `BANK` | Bank name, account name/number, DuitNow ID |
+| `PAYMENT_TERMS` | The term checkboxes — term number, year, start/end dates, sessions, price (RM) |
+| `formatMoney` | Currency formatting (`RM`) |
+
+Wording lives in two dictionaries that mirror each other exactly:
+
+| File | Contents |
+| --- | --- |
+| `src/i18n/en.js` | Every English string: hero, form labels, validation errors, terms, success page, PDF labels |
+| `src/i18n/zh.js` | The same keys in Chinese |
 
 Change → `npm run build` → re-upload `dist`. That is the whole update loop.
 
@@ -95,10 +104,15 @@ Change → `npm run build` → re-upload `dist`. That is the whole update loop.
 ├── src/
 │   ├── main.jsx                React entry point
 │   ├── App.jsx                 landing ▸ form ▸ success switching
-│   ├── config.js               ALL editable content (fees, bank, academy, terms)
+│   ├── config.js               business details (fees, bank, academy, terms)
+│   ├── i18n/
+│   │   ├── en.js               every English string
+│   │   ├── zh.js               every Chinese string
+│   │   └── index.jsx           language provider + useI18n() hook
 │   ├── styles.css              design system (colours, type, components)
 │   ├── components/
 │   │   ├── Landing.jsx         full-screen hero + fee dialog
+│   │   ├── LanguageToggle.jsx  EN / 中文 switch
 │   │   ├── RegistrationFlow.jsx  state, validation, submit pipeline
 │   │   ├── Stepper.jsx         4-step progress indicator
 │   │   ├── StepShell.jsx       card layout shared by all steps
@@ -115,7 +129,7 @@ Change → `npm run build` → re-upload `dist`. That is the whole update loop.
 │       ├── agreement.js        jsPDF agreement builder (lazy-loaded)
 │       ├── signature.js        strokes ▸ cropped PNG
 │       ├── submit.js           POST to Apps Script
-│       ├── terms.js            selected terms + totals
+│       ├── terms.js            selected terms, totals, localised date ranges
 │       └── utils.js            validation, formatting, image compression
 ├── google-apps-script/
 │   ├── Code.gs                 the backend: sheet + drive + emails
@@ -129,6 +143,11 @@ Change → `npm run build` → re-upload `dist`. That is the whole update loop.
 
 - **Bundle**: the landing page ships ~87 kB gzipped; the 400 kB PDF library is only
   downloaded when the parent actually submits.
+- **Language** starts as English, switches instantly with the header toggle, is stored in
+  `localStorage`, and the parent's choice is sent with the submission so the confirmation
+  email is written in the same language.
+- **Malaysian formats**: NRIC is validated and formatted as `YYMMDD-PB-###G`; mobile numbers
+  as `012-345 6789` or `011-2345 6789`; the athlete's age comes from the NRIC birth year.
 - **Signature images** are cropped, trimmed of empty space and exported at 1200 px wide.
 - **Receipt photos** are automatically resized (max 1700 px, JPEG) so a phone photo of 8 MB
   becomes ~300 kB before upload.

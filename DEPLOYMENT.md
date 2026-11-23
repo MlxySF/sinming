@@ -86,9 +86,10 @@ Open <http://localhost:4173>, click through the form, and confirm it works.
 
 ---
 
-## Part 2 — Upload to cPanel hosting (Hostinger, Exabytes, Vodien, GoDaddy…)
+## Part 2 — Upload to cPanel hosting (Hostinger, Exabytes, Shinjiru, GoDaddy…)
 
-This is the most common setup for a small business in Singapore.
+This is the most common setup for a small business in Malaysia (Hostinger, Exabytes,
+Vodien, Shinjiru, GoDaddy…).
 
 1. Log in to your hosting control panel (cPanel / hPanel).
 2. Open **File Manager**.
@@ -205,12 +206,12 @@ Already handled — the build uses **relative** asset paths (`base: './'` in
 | I want to change… | Edit this file | Then |
 | --- | --- | --- |
 | Term dates / fees | `src/config.js` → `PAYMENT_TERMS` | `npm run build` + re-upload `dist` |
-| Bank account, PayNow | `src/config.js` → `BANK` | same |
+| Bank account, DuitNow | `src/config.js` → `BANK` | same |
 | Academy name, phone, email, address | `src/config.js` → `ACADEMY` | same |
-| Terms & conditions wording | `src/config.js` → `AGREEMENT_TERMS` | same |
-| Headline text, stats | `src/config.js` → `LANDING` | same |
+| Terms & conditions wording | `src/i18n/en.js` + `src/i18n/zh.js` → `terms.list` | same |
+| Any English / Chinese wording | `src/i18n/en.js`, `src/i18n/zh.js` | same |
 | Colours / fonts | `src/styles.css` (`:root` variables at the top) | same |
-| Email template wording | `google-apps-script/Code.gs` → `parentEmailHtml_` | Deploy ▸ Manage deployments ▸ new version |
+| Email template wording | `google-apps-script/Code.gs` → `EMAIL_COPY` / `parentEmailHtml_` | Deploy ▸ Manage deployments ▸ new version |
 | Google Sheet email / admin notifications | `google-apps-script/Code.gs` → `CONFIG` | new deployment version |
 
 > Rule of thumb: **anything in `src/` or `.env` requires a rebuild**; anything in
