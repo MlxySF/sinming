@@ -277,9 +277,10 @@ domain — no external dependency, no CORS, fastest option.
 **After any of the above:** `npm run build` → re-upload `dist`. The logo also
 becomes the browser tab icon automatically.
 
-**A second logo on the right of the header:** `ACADEMY.logoRightUrl` (same rules as
-above — any direct image link, or an imported file). It sits at the far right next
-to the EN/中文 switch. Leave it `''` to hide it.
+**A second logo (partner / federation) beside the title:** `ACADEMY.logoRightUrl`
+(same rules as above — any direct image link, or an imported file). It sits inside
+the brand block, immediately to the right of "Wushu Sport Academy". Leave it `''`
+to hide it.
 
 **Email logo (optional):** set `LOGO_URL` in the `CONFIG` block of
 `google-apps-script/Code.gs` to the same public https link, then deploy a new

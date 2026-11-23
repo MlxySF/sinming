@@ -95,9 +95,6 @@ export default function Landing({ onStart }) {
             <span className="brand__name">{ACADEMY.name}</span>
             <span className="brand__sub">{m.brand.sub}</span>
           </span>
-        </div>
-
-        <div className="nav__right">
           {ACADEMY.logoRightUrl ? (
             <img
               className="brand__logo brand__logo--right"
@@ -108,8 +105,9 @@ export default function Landing({ onStart }) {
               decoding="async"
             />
           ) : null}
-          <LanguageToggle />
         </div>
+
+        <LanguageToggle />
       </header>
 
       <main className="hero">

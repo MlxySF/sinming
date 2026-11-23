@@ -279,9 +279,6 @@ export default function RegistrationFlow({ onComplete, onExit }) {
                 {m.brand.sub}
               </span>
             </span>
-          </div>
-
-          <div className="nav__right">
             {ACADEMY.logoRightUrl ? (
               <img
                 className="brand__logo brand__logo--right"
@@ -292,8 +289,9 @@ export default function RegistrationFlow({ onComplete, onExit }) {
                 decoding="async"
               />
             ) : null}
-            <LanguageToggle compact />
           </div>
+
+          <LanguageToggle compact />
         </div>
       </header>
 
