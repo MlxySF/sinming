@@ -37,7 +37,7 @@ const CONFIG = {
   ACADEMY_COMPANY_NO: '202301234567',
 
   // Optional: a public https link to your logo — shown at the top of emails.
-  LOGO_URL: '',
+  LOGO_URL: 'https://wushusportacademy.com/cache/Wushu%20Sport%20Academy%20Circle%20Yellow.png',
 
   BANK_BANK_NAME: 'Maybank',
   BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',

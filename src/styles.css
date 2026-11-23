@@ -398,8 +398,6 @@ a {
   display: block;
   flex: none;
   object-fit: contain;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
 }
 
 .brand__text {
@@ -2580,8 +2578,6 @@ html[data-lang='zh'] .hero__title {
   display: block;
   flex: none;
   object-fit: contain;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
 }
 
 .brand__text {

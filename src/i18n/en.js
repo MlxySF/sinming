@@ -12,7 +12,7 @@ const en = {
       'Register for Wushu Sport Academy classes in Malaysia. Review the agreement, sign digitally, choose your term fees and upload your payment receipt — all in one place.',
   },
 
-  brand: { sub: 'Martial Arts · Malaysia' },
+  brand: { sub: 'Martial Arts' },
   langToggle: { label: 'Language', en: 'EN', zh: '中文' },
 
   hero: {

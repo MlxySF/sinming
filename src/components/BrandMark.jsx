@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { ACADEMY } from '../config';
 
 /**
  * Academy logo.
- * Uses ACADEMY.logoUrl when set (remote link or imported file); otherwise it
- * falls back to the built-in gold "武" seal.
+ * Uses ACADEMY.logoUrl when set (remote link or imported file); otherwise — or
+ * if the image fails to load — it falls back to the built-in gold "武" seal.
  */
 export default function BrandMark({ size = 46, className = '' }) {
-  if (ACADEMY.logoUrl) {
+  const [failed, setFailed] = useState(false);
+
+  if (ACADEMY.logoUrl && !failed) {
     return (
       <img
         src={ACADEMY.logoUrl}
@@ -15,6 +18,7 @@ export default function BrandMark({ size = 46, className = '' }) {
         style={{ width: size, height: size }}
         loading="eager"
         decoding="async"
+        onError={() => setFailed(true)}
       />
     );
   }

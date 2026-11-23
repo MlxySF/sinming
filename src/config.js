@@ -32,7 +32,7 @@ export const ACADEMY = {
      Tip: a square PNG with a transparent background, at least 200×200 px,
      looks best. Landscape logos also work — they are fitted inside the square.
      ------------------------------------------------------------------------ */
-  logoUrl: '',
+  logoUrl: 'https://wushusportacademy.com/cache/Wushu%20Sport%20Academy%20Circle%20Yellow.png',
 
   email: 'admin@wushusportacademy.com',
   phone: '019-219 1688',
