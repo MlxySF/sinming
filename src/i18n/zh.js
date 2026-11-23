@@ -66,6 +66,13 @@ const zh = {
     ],
 
     agreement: {
+      classDetails: {
+        title: '上课资料',
+        dayLabel: '上课日',
+        timeLabel: '时间',
+        venueLabel: '地点',
+        note: '请在同意以下条款前，先确认上课时间与地点。',
+      },
       title: '报名同意书与授权',
       description:
         '请完整阅读同意书内容，然后在卡片下方签名。签名会转换成图片，并附加到此同意书的 PDF 档案中。',

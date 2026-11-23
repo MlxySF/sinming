@@ -1,14 +1,19 @@
-import { ACADEMY } from '../config';
+import { ACADEMY, CLASS_DETAILS } from '../config';
 import SignaturePad from '../components/SignaturePad';
 import StepShell from '../components/StepShell';
-import { Alert, Check, Info, SignatureIcon } from '../components/Icons';
+import { Alert, Calendar, Check, Clock, Info, Pin, SignatureIcon } from '../components/Icons';
 import { cx } from '../lib/utils';
 import { useI18n } from '../i18n';
 
 export default function StepAgreement({ data, update, errors, onNext, onBack, showBack }) {
-  const { m } = useI18n();
+  const { m, lang } = useI18n();
   const { agreed, signature, parent } = data;
   const copy = m.form.agreement;
+  const details = [
+    { key: 'day', Icon: Calendar, label: copy.classDetails.dayLabel, value: CLASS_DETAILS.day[lang] },
+    { key: 'time', Icon: Clock, label: copy.classDetails.timeLabel, value: CLASS_DETAILS.time[lang] },
+    { key: 'venue', Icon: Pin, label: copy.classDetails.venueLabel, value: CLASS_DETAILS.venue[lang] },
+  ];
 
   return (
     <StepShell
@@ -21,6 +26,26 @@ export default function StepAgreement({ data, update, errors, onNext, onBack, sh
       showBack={showBack}
       footerHint={copy.footerHint}
     >
+      <div className="class-details">
+        <div className="class-details__head">
+          <span className="class-details__title">{copy.classDetails.title}</span>
+          <span className="class-details__note">{copy.classDetails.note}</span>
+        </div>
+        <div className="class-details__grid">
+          {details.map(({ key, Icon, label, value }) => (
+            <div className="class-details__item" key={key}>
+              <span className="class-details__icon" aria-hidden="true">
+                <Icon size={15} />
+              </span>
+              <span className="class-details__body">
+                <span className="class-details__label">{label}</span>
+                <span className="class-details__value">{value}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="terms-box" tabIndex={0} aria-label={m.terms.heading}>
         <div className="terms-box__title">
           <SignatureIcon size={15} /> {ACADEMY.name} — {m.terms.heading}

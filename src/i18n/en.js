@@ -71,6 +71,13 @@ const en = {
     ],
 
     agreement: {
+      classDetails: {
+        title: 'Class details',
+        dayLabel: 'Training day',
+        timeLabel: 'Time',
+        venueLabel: 'Venue',
+        note: 'Please check the schedule and venue before you agree to the terms below.',
+      },
       title: 'Registration agreement & consent',
       description:
         'Please read the agreement in full, then sign at the bottom of the card. Your signature is turned into an image and attached to a PDF copy of this agreement.',

@@ -69,6 +69,25 @@ export const IS_DEMO_MODE = SHEETS_ENDPOINT === '';
 export const FORM_TOKEN = (import.meta.env.VITE_FORM_TOKEN || '').trim();
 
 /* --------------------------------------------------------------------------
+   CLASS DETAILS — shown on step 1 (terms & conditions).
+   Keep both languages side by side so nothing drifts out of sync.
+   -------------------------------------------------------------------------- */
+export const CLASS_DETAILS = {
+  day: {
+    en: 'Every Monday',
+    zh: '每逢星期一',
+  },
+  time: {
+    en: '7:00 pm – 9:00 pm',
+    zh: '晚上 7:00 – 9:00',
+  },
+  venue: {
+    en: 'SJK(C) Sin Ming',
+    zh: 'SJK(C) 新明华小',
+  },
+};
+
+/* --------------------------------------------------------------------------
    BANK / PAYMENT DETAILS — update these with your real account.
    -------------------------------------------------------------------------- */
 export const BANK = {

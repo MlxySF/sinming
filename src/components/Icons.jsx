@@ -154,6 +154,20 @@ export const Calendar = ({ size = 16, ...p }) => (
   </svg>
 );
 
+export const Clock = ({ size = 16, ...p }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base} {...p}>
+    <circle cx="12" cy="12" r="8.4" />
+    <path d="M12 7.6V12l3.1 2" />
+  </svg>
+);
+
+export const Pin = ({ size = 16, ...p }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...base} {...p}>
+    <path d="M12 21.2s6.4-5.6 6.4-10.3A6.4 6.4 0 0 0 5.6 10.9c0 4.7 6.4 10.3 6.4 10.3Z" />
+    <circle cx="12" cy="10.6" r="2.4" />
+  </svg>
+);
+
 export const Sparkle = ({ size = 14, ...p }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" {...p}>
     <path d="M12 2.5l1.6 5.2 5.4 1.6-5.4 1.6L12 16.1l-1.6-5.2L5 9.3l5.4-1.6L12 2.5Z" />
