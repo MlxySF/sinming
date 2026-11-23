@@ -35,12 +35,12 @@ Change these to your real details:
 const CONFIG = {
   SPREADSHEET_ID: '',                              // leave empty (script is bound to the sheet)
   SHEET_NAME: 'Registrations',
+  DRIVE_FOLDER_ID: '',              // ← optional: paste your Drive folder ID here
   DRIVE_FOLDER_NAME: 'Wushu Sport Academy — Registrations',
   ADMIN_EMAILS: 'admin@wushusportacademy.com',     // ← your email
   ACADEMY_NAME: 'Wushu Sport Academy',
   ACADEMY_EMAIL: 'admin@wushusportacademy.com',
   ACADEMY_PHONE: '019-219 1688',
-  ACADEMY_ADDRESS: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
   ACADEMY_COMPANY_NO: '202301234567',
   LOGO_URL: '',              // optional public https link — shows in emails
 
@@ -57,14 +57,40 @@ const CONFIG = {
 
 Save again.
 
-## Step 4 — Create the Drive folder (optional but recommended)
+## Step 4 — Choose where uploads are saved
 
-In the Apps Script editor choose the function **`setupOnce`** in the dropdown and press
-**Run**. Approve the permissions when Google asks
+Every registration creates three files: the signature, the payment receipt and the
+signed agreement PDF. They are saved in your Google Drive.
+
+**Option A — use a folder you already have (recommended).** In Google Drive, open
+(or create) the folder you want. Look at the address bar — the folder ID is the long
+string after `/folders/`:
+
+```
+https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYzXxYyZz
+                                         └──── this is DRIVE_FOLDER_ID ────┘
+```
+
+Paste it into `CONFIG` at the top of `Code.gs`:
+
+```js
+DRIVE_FOLDER_ID: '1AbCdEfGhIjKlMnOpQrStUvWxYzXxYyZz',
+```
+
+Make sure the Google account running the script (the one that owns the Sheet) has
+**editor** access to that folder — otherwise uploads are rejected and the reason is
+written to the Apps Script log.
+
+**Option B — let the script create one.** Leave `DRIVE_FOLDER_ID` empty. The script
+looks for a folder named `DRIVE_FOLDER_NAME` and creates it on the first upload.
+
+Then, in the Apps Script editor choose the function **`setupOnce`** in the dropdown
+and press **Run**. Approve the permissions when Google asks
 (*"Review permissions" ▸ choose account ▸ Advanced ▸ Go to … (unsafe) ▸ Allow* — this
 warning is normal for your own scripts).
 
-The log will show links to the sheet and the Drive folder. Uploads will be saved there.
+The log will show links to the sheet and the upload folder — click the folder link to
+confirm it is the one you want. That is the fastest way to check a folder ID.
 
 ## Step 5 — Deploy as a Web App
 
@@ -141,7 +167,9 @@ Change **Status** to `Confirmed` once you have verified the bank transfer.
 ## Good practice
 
 - Keep the sheet private — do not share it "anyone with the link can edit".
-- The Drive folder is link-shared (view only) so the email links open for you.
+- Each uploaded file (signature, receipt, agreement) is link-shared as view-only so
+  the links in the admin email open for you. Tighten this in `saveFile_()` if your
+  policy forbids it — the admin keeps access either way.
 - Check the sheet once a day; it is your enrolment ledger.
 - Free Gmail accounts can send ~100 emails/day through Apps Script (plenty).
 - The parent confirmation email is sent in the language the parent used on the
@@ -155,4 +183,5 @@ Change **Status** to `Confirmed` once you have verified the bank transfer.
 | Parent email not received | Check spam; check the **Email Sent** column; free accounts have daily send limits. |
 | Form shows "We could not reach the server" | The deployment access is not **Anyone**, or you edited the code without deploying a new version. |
 | `Script function not found: doPost` | The code was pasted into the wrong file/project — paste it into `Code.gs` of the sheet's script. |
+| Submit fails with "Cannot open the upload folder DRIVE_FOLDER_ID" | The folder ID in `CONFIG` is wrong, or the account running the script cannot edit that folder. Open the folder in Drive, copy the ID from the URL again, and share the folder with your script account as **Editor**. |
 | Everything is saved but emails go to spam | Add SPF/DKIM? Not possible with Gmail API free tier — ask parents to whitelist your address. |

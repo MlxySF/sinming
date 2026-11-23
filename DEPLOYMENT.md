@@ -208,7 +208,7 @@ Already handled — the build uses **relative** asset paths (`base: './'` in
 | Term dates / fees | `src/config.js` → `PAYMENT_TERMS` | `npm run build` + re-upload `dist` |
 | Bank account number | `src/config.js` → `BANK` | same |
 | Weekly class day / time / venue (step 1) | `src/config.js` → `CLASS_DETAILS` | same, both languages side by side |
-| Academy name, phone, email, address | `src/config.js` → `ACADEMY` | same |
+| Academy name, phone, email | `src/config.js` → `ACADEMY` | same |
 | Terms & conditions wording | `src/i18n/en.js` + `src/i18n/zh.js` → `terms.list` | same |
 | Any English / Chinese wording | `src/i18n/en.js`, `src/i18n/zh.js` | same |
 | Colours / fonts | `src/styles.css` (`:root` variables at the top) | same |
