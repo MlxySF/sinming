@@ -400,6 +400,18 @@ a {
   object-fit: contain;
 }
 
+.nav__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+}
+
+.brand__logo--right {
+  width: 46px;
+  height: 46px;
+}
+
 .brand__text {
   display: flex;
   flex-direction: column;
@@ -2439,6 +2451,13 @@ html[data-lang='zh'] .hero__title {
     padding: 6px 11px;
     font-size: 11px;
   }
+  .nav__right {
+    gap: 10px;
+  }
+  .brand__logo--right {
+    width: 34px;
+    height: 34px;
+  }
   .hero__contact {
     bottom: 18px;
     font-size: 11px;
@@ -2578,6 +2597,18 @@ html[data-lang='zh'] .hero__title {
   display: block;
   flex: none;
   object-fit: contain;
+}
+
+.nav__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+}
+
+.brand__logo--right {
+  width: 46px;
+  height: 46px;
 }
 
 .brand__text {

@@ -97,7 +97,19 @@ export default function Landing({ onStart }) {
           </span>
         </div>
 
-        <LanguageToggle />
+        <div className="nav__right">
+          {ACADEMY.logoRightUrl ? (
+            <img
+              className="brand__logo brand__logo--right"
+              src={ACADEMY.logoRightUrl}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
+          <LanguageToggle />
+        </div>
       </header>
 
       <main className="hero">

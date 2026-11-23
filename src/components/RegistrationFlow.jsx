@@ -281,7 +281,19 @@ export default function RegistrationFlow({ onComplete, onExit }) {
             </span>
           </div>
 
-          <LanguageToggle compact />
+          <div className="nav__right">
+            {ACADEMY.logoRightUrl ? (
+              <img
+                className="brand__logo brand__logo--right"
+                src={ACADEMY.logoRightUrl}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : null}
+            <LanguageToggle compact />
+          </div>
         </div>
       </header>
 

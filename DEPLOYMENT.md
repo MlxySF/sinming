@@ -211,6 +211,7 @@ Already handled — the build uses **relative** asset paths (`base: './'` in
 | Terms & conditions wording | `src/i18n/en.js` + `src/i18n/zh.js` → `terms.list` | same |
 | Any English / Chinese wording | `src/i18n/en.js`, `src/i18n/zh.js` | same |
 | Colours / fonts | `src/styles.css` (`:root` variables at the top) | same |
+| Academy logo / right-side logo | `src/config.js` → `ACADEMY.logoUrl`, `ACADEMY.logoRightUrl` | same |
 | Chinese fonts | Google Fonts link in `index.html` + `--font-cjk` / `--font-cjk-display` in `src/styles.css` | same |
 | Email template wording | `google-apps-script/Code.gs` → `EMAIL_COPY` / `parentEmailHtml_` | Deploy ▸ Manage deployments ▸ new version |
 | Google Sheet email / admin notifications | `google-apps-script/Code.gs` → `CONFIG` | new deployment version |
@@ -275,6 +276,10 @@ domain — no external dependency, no CORS, fastest option.
 
 **After any of the above:** `npm run build` → re-upload `dist`. The logo also
 becomes the browser tab icon automatically.
+
+**A second logo on the right of the header:** `ACADEMY.logoRightUrl` (same rules as
+above — any direct image link, or an imported file). It sits at the far right next
+to the EN/中文 switch. Leave it `''` to hide it.
 
 **Email logo (optional):** set `LOGO_URL` in the `CONFIG` block of
 `google-apps-script/Code.gs` to the same public https link, then deploy a new
