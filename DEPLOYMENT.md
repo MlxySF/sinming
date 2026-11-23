@@ -211,6 +211,7 @@ Already handled — the build uses **relative** asset paths (`base: './'` in
 | Terms & conditions wording | `src/i18n/en.js` + `src/i18n/zh.js` → `terms.list` | same |
 | Any English / Chinese wording | `src/i18n/en.js`, `src/i18n/zh.js` | same |
 | Colours / fonts | `src/styles.css` (`:root` variables at the top) | same |
+| Chinese fonts | Google Fonts link in `index.html` + `--font-cjk` / `--font-cjk-display` in `src/styles.css` | same |
 | Email template wording | `google-apps-script/Code.gs` → `EMAIL_COPY` / `parentEmailHtml_` | Deploy ▸ Manage deployments ▸ new version |
 | Google Sheet email / admin notifications | `google-apps-script/Code.gs` → `CONFIG` | new deployment version |
 

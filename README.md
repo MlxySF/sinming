@@ -143,6 +143,10 @@ Change → `npm run build` → re-upload `dist`. That is the whole update loop.
 
 - **Bundle**: the landing page ships ~87 kB gzipped; the 400 kB PDF library is only
   downloaded when the parent actually submits.
+- **Typography**: English uses Anton (display) + Cormorant Garamond (accent) + Inter (body).
+  Chinese switches to **Ma Shan Zheng** (brush calligraphy) for headlines, the 武 seal and the
+  watermarks, and **Noto Serif SC** for paragraph copy — set in `src/styles.css` under the
+  `html[data-lang='zh']` rules.
 - **Language** starts as English, switches instantly with the header toggle, is stored in
   `localStorage`, and the parent's choice is sent with the submission so the confirmation
   email is written in the same language.

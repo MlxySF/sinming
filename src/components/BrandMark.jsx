@@ -22,7 +22,7 @@ export default function BrandMark({ size = 46, className = '' }) {
   return (
     <span
       className={`brand__seal ${className}`.trim()}
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.52) }}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.6) }}
       aria-hidden="true"
     >
       武

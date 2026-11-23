@@ -8,7 +8,13 @@ export const LANG_ORDER = ['en', 'zh'];
 const STORAGE_KEY = 'wsa-lang';
 const LanguageContext = createContext(null);
 
-function readInitialLang() {
+export function applyLangAttribute(lang) {
+  const dict = DICTS[lang] || DICTS.en;
+  document.documentElement.lang = dict.htmlLang;
+  document.documentElement.dataset.lang = DICTS[lang] ? lang : 'en';
+}
+
+export function readInitialLang() {
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (saved && DICTS[saved]) return saved;
@@ -23,8 +29,7 @@ export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState(readInitialLang);
 
   useEffect(() => {
-    document.documentElement.lang = DICTS[lang].htmlLang;
-    document.documentElement.dataset.lang = lang;
+    applyLangAttribute(lang);
     try {
       window.localStorage.setItem(STORAGE_KEY, lang);
     } catch (error) {
