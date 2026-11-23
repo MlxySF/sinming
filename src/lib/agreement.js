@@ -110,7 +110,7 @@ export async function buildAgreementPdf({
   doc.setFontSize(7.6);
   doc.setTextColor(190, 184, 174);
   doc.text(
-    asciiSafe(`${ACADEMY.address}   |   ${ACADEMY.email}   |   ${ACADEMY.phone}`),
+    asciiSafe(`${ACADEMY.email}   |   ${ACADEMY.phone}`),
     M,
     27
   );

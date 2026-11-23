@@ -23,8 +23,16 @@ const CONFIG = {
 
   SHEET_NAME: 'Registrations',
 
-  // Folder in YOUR Google Drive where uploads are stored.
-  // It is created automatically the first time if it does not exist.
+  // Folder in YOUR Google Drive where receipts, signatures and signed
+  // agreements are uploaded. Open the folder in Drive and copy the ID from the
+  // URL — the long string after /folders/:
+  //   https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYz
+  //                                            └──────── this part ────────┘
+  // The Google account running this script must have edit access to it.
+  DRIVE_FOLDER_ID: '',
+
+  // Used only when DRIVE_FOLDER_ID is empty: a folder with this name is looked
+  // up (and created the first time if it does not exist).
   DRIVE_FOLDER_NAME: 'Wushu Sport Academy — Registrations',
 
   // Where the admin notification email goes (comma separated is fine).
@@ -33,7 +41,6 @@ const CONFIG = {
   ACADEMY_NAME: 'Wushu Sport Academy',
   ACADEMY_EMAIL: 'admin@wushusportacademy.com',
   ACADEMY_PHONE: '019-219 1688',
-  ACADEMY_ADDRESS: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
   ACADEMY_COMPANY_NO: '202301234567',
 
   // Optional: a public https link to your logo — shown at the top of emails.
@@ -110,7 +117,21 @@ function doPost(e) {
       return json_({ ok: false, error: 'Invalid form token. Check VITE_FORM_TOKEN matches Code.gs.' });
     }
 
-    const folder = getFolder_();
+    let folder;
+    try {
+      folder = getFolder_();
+    } catch (folderError) {
+      return json_({
+        ok: false,
+        error:
+          'Uploads are not set up correctly on the academy side. Please contact us at ' +
+          CONFIG.ACADEMY_PHONE +
+          ' and we will register your child for you. (' +
+          String(folderError && folderError.message ? folderError.message : folderError) +
+          ')',
+      });
+    }
+
     const ref = String(data.ref || '').trim();
     const stamp = nowStamp_();
 
@@ -301,6 +322,23 @@ function getSheet_() {
 }
 
 function getFolder_() {
+  const id = String(CONFIG.DRIVE_FOLDER_ID || '').trim();
+  if (id) {
+    try {
+      return DriveApp.getFolderById(id);
+    } catch (error) {
+      throw new Error(
+        'Cannot open the upload folder DRIVE_FOLDER_ID "' +
+          id +
+          '". Check that the ID is correct and that the Google account running ' +
+          'this script has edit access to that folder. (' +
+          error.message +
+          ')'
+      );
+    }
+  }
+
+  // Fallback: find or create a folder by name.
   const name = CONFIG.DRIVE_FOLDER_NAME;
   const found = DriveApp.getFoldersByName(name);
   if (found.hasNext()) return found.next();
@@ -497,8 +535,6 @@ function emailShell_(copy, title, preheader, inner) {
     esc_(CONFIG.ACADEMY_NAME) +
     ' · SSM ' +
     esc_(CONFIG.ACADEMY_COMPANY_NO) +
-    '<br>' +
-    esc_(CONFIG.ACADEMY_ADDRESS) +
     '<br>' +
     '<a href="mailto:' +
     esc_(CONFIG.ACADEMY_EMAIL) +

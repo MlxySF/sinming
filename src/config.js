@@ -42,7 +42,6 @@ export const ACADEMY = {
   email: 'admin@wushusportacademy.com',
   phone: '019-219 1688',
   whatsapp: '019-219 1688',
-  address: 'No. 12, Jalan Ampang, 50450 Kuala Lumpur, Malaysia',
   // SSM / company registration number shown in the footer and the agreement.
   companyNo: '202301234567',
   contactPerson: 'Academy Admin',
