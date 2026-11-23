@@ -281,7 +281,7 @@ export async function buildAgreementPdf({
   y += 15;
 
   para(
-    `${L.paymentTo}: ${BANK.bankName} - ${BANK.accountName} - ${BANK.accountNumber} - DuitNow: ${BANK.duitnow}. ` +
+    `${L.paymentTo}: ${BANK.bankName} - ${BANK.accountName} - ${BANK.accountNumber}. ` +
       'Fees are payable per month / per term as invoiced, and a payment receipt is to be uploaded with this registration.'
   );
   y += 3;

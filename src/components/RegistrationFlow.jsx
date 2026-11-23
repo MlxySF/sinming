@@ -272,12 +272,7 @@ export default function RegistrationFlow({ onComplete, onExit }) {
           <div className="brand" aria-label={ACADEMY.name}>
             <BrandMark size={36} />
             <span className="brand__text">
-              <span className="brand__name" style={{ fontSize: 11.5 }}>
-                {ACADEMY.name}
-              </span>
-              <span className="brand__sub" style={{ fontSize: 9 }}>
-                {m.brand.sub}
-              </span>
+              <span className="brand__name">{ACADEMY.name}</span>
             </span>
             {ACADEMY.logoRightUrl ? (
               <img

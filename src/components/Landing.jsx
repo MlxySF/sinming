@@ -93,7 +93,6 @@ export default function Landing({ onStart }) {
           <BrandMark size={46} />
           <span className="brand__text">
             <span className="brand__name">{ACADEMY.name}</span>
-            <span className="brand__sub">{m.brand.sub}</span>
           </span>
           {ACADEMY.logoRightUrl ? (
             <img

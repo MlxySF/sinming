@@ -47,7 +47,6 @@ const CONFIG = {
   BANK_BANK_NAME: 'Maybank',
   BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',
   BANK_ACCOUNT_NO: '5123 4567 8901',
-  BANK_DUITNOW: '019-219 1688',
 
   SHARED_TOKEN: '',          // optional — must match VITE_FORM_TOKEN
   SEND_PARENT_EMAIL: true,

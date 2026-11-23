@@ -191,7 +191,6 @@ export default function StepPayment({ data, update, errors, onNext, onBack, subm
           <CopyRow label={copy.labels.bank} value={BANK.bankName} />
           <CopyRow label={copy.labels.accountName} value={BANK.accountName} />
           <CopyRow label={copy.labels.accountNumber} value={BANK.accountNumber} mono />
-          <CopyRow label={copy.labels.duitnow} value={BANK.duitnow} mono />
         </div>
         <div className="bank__total">
           <div className="bank__total-label">

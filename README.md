@@ -33,7 +33,7 @@ automatically from the birth year inside the NRIC** (month and day are ignored).
 
 **5 · Step 4 — Payment**
 Multi-select term checkboxes (dates + price each) that add up into a total due (RM), the
-bank / DuitNow details with copy buttons, and a drag-and-drop **receipt upload**.
+bank transfer details with copy buttons, and a drag-and-drop **receipt upload**.
 
 **6 · Submit**
 Writes a row to the Google Sheet → saves the three files to Drive → emails the parent (HTML
@@ -80,7 +80,7 @@ GitHub Pages, plus a go-live checklist and troubleshooting.
 | Export | What it controls |
 | --- | --- |
 | `ACADEMY` | Name, email, phone, address, SSM/company number, **logo link** (site, PDF and emails) |
-| `BANK` | Bank name, account name/number, DuitNow ID |
+| `BANK` | Bank name, account name, account number |
 | `PAYMENT_TERMS` | The term checkboxes — term number, year, start/end dates, sessions, price (RM) |
 | `formatMoney` | Currency formatting (`RM`) |
 

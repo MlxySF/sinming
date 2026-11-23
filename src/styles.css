@@ -408,22 +408,30 @@ a {
 
 .brand__text {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
 }
 
+/* The academy name is the loudest thing in the header: condensed display face,
+   wide tracking and a brushed-gold gradient. */
 .brand__name {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  background: linear-gradient(180deg, #fffaf0 0%, #f2d69b 52%, #cfa154 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(224, 180, 92, 0.22));
 }
 
-.brand__sub {
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-on-dark-soft);
+/* compact version inside the registration form header */
+.shell__header-inner .brand__name {
+  font-size: 14px;
+  letter-spacing: 0.13em;
 }
 
 .nav__links {
@@ -2570,7 +2578,11 @@ html[data-lang='zh'] .hero__title {
     font-size: 21px;
   }
   .brand__name {
-    font-size: 11.5px;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+  }
+  .shell__header-inner .brand__name {
+    font-size: 12px;
   }
   .hero__actions .btn {
     width: 100%;

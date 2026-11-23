@@ -13,7 +13,6 @@ const zh = {
       '马来西亚武术体育学院课程报名。签署同意书、填写资料、选择学费并上传付款收据，全部在一个页面完成。',
   },
 
-  brand: { sub: '武术' },
   langToggle: { label: '语言', en: 'EN', zh: '中文' },
 
   hero: {
@@ -122,9 +121,9 @@ const zh = {
     athlete: {
       title: '学员资料',
       description: '请填写加入课程的学员资料。身份证号码同时用来计算年龄。',
-      name: '姓名（与身份证 / 出生证明相同）',
-      namePlaceholder: '例：陈嘉豪',
-      chineseName: '中文姓名',
+      name: '英文姓名（与身份证相同）',
+      namePlaceholder: '例：Tan Jia Hao',
+      chineseName: '中文姓名（与身份证相同）',
       chineseNamePlaceholder: '例：陈家豪',
       chineseNameHint: '用于比赛报名表格与证书。',
       ic: '身份证号码（MyKad）',
@@ -160,7 +159,6 @@ const zh = {
         bank: '银行',
         accountName: '户名',
         accountNumber: '账号',
-        duitnow: 'DuitNow',
       },
       copy: (label) => `复制${label}`,
       copied: '已复制',

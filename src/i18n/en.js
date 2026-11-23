@@ -12,7 +12,6 @@ const en = {
       'Register for Wushu Sport Academy classes in Malaysia. Review the agreement, sign digitally, choose your term fees and upload your payment receipt — all in one place.',
   },
 
-  brand: { sub: 'Martial Arts' },
   langToggle: { label: 'Language', en: 'EN', zh: '中文' },
 
   hero: {
@@ -129,9 +128,9 @@ const en = {
       title: 'Athlete details',
       description:
         'Tell us about the student joining the programme. The NRIC also determines the athlete’s age.',
-      name: 'Full name (as per NRIC / birth certificate)',
+      name: 'English name (as per NRIC)',
       namePlaceholder: 'e.g. Ahmad Daniel bin Ahmad',
-      chineseName: 'Chinese name',
+      chineseName: 'Chinese name (as per NRIC)',
       chineseNamePlaceholder: 'e.g. 陈家豪',
       chineseNameHint: 'Used on competition entry forms and certificates.',
       ic: 'NRIC (MyKad)',
@@ -168,7 +167,6 @@ const en = {
         bank: 'Bank',
         accountName: 'Account name',
         accountNumber: 'Account number',
-        duitnow: 'DuitNow',
       },
       copy: (label) => `Copy ${label}`,
       copied: 'Copied',

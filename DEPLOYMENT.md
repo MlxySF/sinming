@@ -206,7 +206,7 @@ Already handled — the build uses **relative** asset paths (`base: './'` in
 | I want to change… | Edit this file | Then |
 | --- | --- | --- |
 | Term dates / fees | `src/config.js` → `PAYMENT_TERMS` | `npm run build` + re-upload `dist` |
-| Bank account, DuitNow | `src/config.js` → `BANK` | same |
+| Bank account number | `src/config.js` → `BANK` | same |
 | Academy name, phone, email, address | `src/config.js` → `ACADEMY` | same |
 | Terms & conditions wording | `src/i18n/en.js` + `src/i18n/zh.js` → `terms.list` | same |
 | Any English / Chinese wording | `src/i18n/en.js`, `src/i18n/zh.js` | same |

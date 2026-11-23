@@ -75,7 +75,6 @@ export const BANK = {
   bankName: 'Maybank',
   accountName: 'Wushu Sport Academy Sdn Bhd',
   accountNumber: '5123 4567 8901',
-  duitnow: '019-219 1688',
   swift: 'MBBEMYKL',
 };
 

@@ -42,7 +42,6 @@ const CONFIG = {
   BANK_BANK_NAME: 'Maybank',
   BANK_ACCOUNT_NAME: 'Wushu Sport Academy Sdn Bhd',
   BANK_ACCOUNT_NO: '5123 4567 8901',
-  BANK_DUITNOW: '019-219 1688',
 
   SEND_PARENT_EMAIL: true,
   SEND_ADMIN_EMAIL: true,
@@ -407,7 +406,6 @@ const EMAIL_COPY = {
       bank: 'Bank',
       accountName: 'Account name',
       accountNumber: 'Account number',
-      duitnow: 'DuitNow',
     },
     attached: (name) => '📎 Your signed agreement (<b>' + name + '</b>) is attached to this email. Keep it for your records.',
     receiptReceived: (name) => '🧾 Receipt received: <b>' + name + '</b> — now pending verification.',
@@ -449,7 +447,6 @@ const EMAIL_COPY = {
       bank: '银行',
       accountName: '户名',
       accountNumber: '账号',
-      duitnow: 'DuitNow',
     },
     attached: (name) => '📎 您签署的同意书（<b>' + name + '</b>）已附在本电邮中，请妥善保存。',
     receiptReceived: (name) => '🧾 已收到收据：<b>' + name + '</b> —— 正在核对中。',
@@ -608,10 +605,6 @@ function parentEmailHtml_(data, ref, stamp, receiptFile, agreementFile) {
     esc_(P.accountNumber) +
     ': <b>' +
     esc_(CONFIG.BANK_ACCOUNT_NO) +
-    '</b><br>' +
-    esc_(P.duitnow) +
-    ': <b>' +
-    esc_(CONFIG.BANK_DUITNOW) +
     '</b>' +
     '</div></div>' +
     /* attachments */
