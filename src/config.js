@@ -34,10 +34,10 @@ export const ACADEMY = {
      ------------------------------------------------------------------------ */
   logoUrl: 'https://wushusportacademy.com/cache/Wushu%20Sport%20Academy%20Circle%20Yellow.png',
 
-  /* Second logo, shown on the RIGHT side of the header (next to the EN/中文
-     switch). Paste any direct image link here — e.g. a partner, federation or
-     school logo. Leave '' to hide it. */
-  logoRightUrl: 'https://wushusportacademy.com/cache/Wushu%20Sport%20Academy%20Circle%20Yellow.png',
+  /* Second logo, shown in the header right beside the academy name — e.g. a
+     partner, federation or school logo. Paste any direct image link here.
+     Leave '' to hide it, or delete this line if you only need one logo. */
+  logoRightUrl: 'https://wushusportacademy.com/cache/Subang%20Logo.png',
 
   email: 'admin@wushusportacademy.com',
   phone: '019-219 1688',

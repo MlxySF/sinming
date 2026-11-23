@@ -7,6 +7,7 @@ import StepAthlete from '../steps/StepAthlete';
 import StepPayment from '../steps/StepPayment';
 import LanguageToggle from './LanguageToggle';
 import BrandMark from './BrandMark';
+import SecondaryLogo from './SecondaryLogo';
 import { buildAgreementPdf } from '../lib/agreement';
 import { submitRegistration } from '../lib/submit';
 import { termOptionsOf, totalOf } from '../lib/terms';
@@ -274,16 +275,7 @@ export default function RegistrationFlow({ onComplete, onExit }) {
             <span className="brand__text">
               <span className="brand__name">{ACADEMY.name}</span>
             </span>
-            {ACADEMY.logoRightUrl ? (
-              <img
-                className="brand__logo brand__logo--right"
-                src={ACADEMY.logoRightUrl}
-                alt=""
-                aria-hidden="true"
-                loading="lazy"
-                decoding="async"
-              />
-            ) : null}
+            <SecondaryLogo />
           </div>
 
           <LanguageToggle compact />
