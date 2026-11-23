@@ -61,7 +61,7 @@ const en = {
     back: 'Back',
     submit: 'Submit registration',
     submitting: 'Submitting…',
-    footerRights: (year, name, companyNo) => `© ${year} ${name} · SSM No. ${companyNo}`,
+    footerRights: (year, name) => `© ${year} ${name}`,
     previewNote: 'Preview mode — this form is not connected to Google Sheets yet.',
 
     steps: [

@@ -340,9 +340,9 @@ export default function RegistrationFlow({ onComplete, onExit }) {
         )}
 
         <div className="form-footer">
-          <span>{copy.footerRights(new Date().getFullYear(), ACADEMY.name, ACADEMY.companyNo)}</span>
+          <span>{copy.footerRights(new Date().getFullYear(), ACADEMY.name)}</span>
           <span>
-            {copy.needHelp} <a href={`mailto:${ACADEMY.email}`}>{ACADEMY.email}</a> ·{' '}
+            {copy.needHelp}{' '}
             <a href={`tel:${telHref(ACADEMY.phone)}`}>{ACADEMY.phone}</a>
           </span>
         </div>

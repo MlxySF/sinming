@@ -56,7 +56,7 @@ const zh = {
     back: '返回',
     submit: '提交报名',
     submitting: '提交中…',
-    footerRights: (year, name, companyNo) => `© ${year} ${name} · 公司注册号 ${companyNo}`,
+    footerRights: (year, name) => `© ${year} ${name}`,
     previewNote: '预览模式 —— 此表单尚未连接 Google 表格。',
 
     steps: [
