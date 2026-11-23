@@ -225,8 +225,8 @@ const en = {
 
   success: {
     title: 'Registration received',
-    subtitle: 'Welcome to the academy',
-    leadBefore: (firstName) => `${firstName}’s place is reserved. A confirmation email with the signed agreement attached is on its way to `,
+    subtitle: 'Welcome to the Academy',
+    leadBefore: (firstName) => `${firstName}. A confirmation email with the signed agreement attached is on its way to `,
     leadAfter: '.',
     reference: 'Reference',
     rows: {
@@ -241,8 +241,7 @@ const en = {
     backHome: 'Back to home',
     nextTitle: 'What happens next',
     nextSteps: [
-      'Our admin verifies your payment receipt — usually within one working day.',
-      'You will receive a WhatsApp message with the class venue, timing and first-lesson details.',
+      'Our admin verifies your payment receipt.',
       'Keep the agreement PDF safe — it is your signed copy of the terms.',
     ],
     demoTitle: 'Preview mode:',

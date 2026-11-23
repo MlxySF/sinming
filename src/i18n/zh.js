@@ -216,7 +216,7 @@ const zh = {
   success: {
     title: '报名已收到',
     subtitle: '欢迎加入学院',
-    leadBefore: (firstName) => `${firstName} 的学额已保留。附有签署同意书的确认电邮正在发送至 `,
+    leadBefore: (firstName) => `${firstName} 。附有签署同意书的确认电邮正在发送至 `,
     leadAfter: '。',
     reference: '报名编号',
     rows: {
@@ -231,8 +231,7 @@ const zh = {
     backHome: '返回首页',
     nextTitle: '接下来',
     nextSteps: [
-      '行政团队会核对您的付款收据 —— 通常在一个工作日内完成。',
-      '您会收到 WhatsApp 讯息，通知上课地点、时间及第一堂课详情。',
+      '行政团队会核对您的付款收据。',
       '请妥善保存同意书 PDF —— 这是您签署的条款副本。',
     ],
     demoTitle: '预览模式：',
