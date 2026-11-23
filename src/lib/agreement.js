@@ -4,9 +4,19 @@ import { asciiSafe, todayLong } from './utils';
 
 const PAGE_W = 210;
 const PAGE_H = 297;
-const M = 16;
+
+/* Page geometry — a classic 20 mm side margin, 18 mm top margin on page 1 and a
+   footer band that content never runs into. */
+const M = 20;
 const CONTENT_W = PAGE_W - M * 2;
-const BOTTOM = PAGE_H - 22;
+const TOP = 18;
+const FOOTER_RULE_Y = PAGE_H - 20;
+const FOOTER_TEXT_Y = PAGE_H - 14.5;
+const BOTTOM = PAGE_H - 27;
+const PAGE_TWO_TOP = 34; /* clears the running header on pages 2+ */
+
+/* Tallest the letterhead may be drawn, in mm. Edit this one number to resize it. */
+const LETTERHEAD_MAX_H = 28;
 
 const INK = [12, 15, 19];
 const GOLD = [176, 132, 58];
@@ -146,23 +156,37 @@ export async function buildAgreementPdf({
 
   /* ---------------------------------------------------------------- header */
   if (letterhead) {
-    /* Letterhead fills the top of page 1, centred, never taller than 46 mm. */
-    const maxH = 46;
-    const scale = Math.min(PAGE_W / letterhead.width, maxH / letterhead.height);
+    /* The letterhead sits inside the margins — like a printed letterhead, not a
+       full-bleed banner. It is never wider than the text column and never taller
+       than LETTERHEAD_MAX_H (raise this number for a bigger header, lower it for
+       a smaller one), and it stays centred. */
+    const maxH = LETTERHEAD_MAX_H;
+    const scale = Math.min(CONTENT_W / letterhead.width, maxH / letterhead.height);
     const imgW = letterhead.width * scale;
     const imgH = letterhead.height * scale;
-    doc.addImage(letterhead.dataUrl, letterhead.format, (PAGE_W - imgW) / 2, 0, imgW, imgH, undefined, 'FAST');
+    doc.addImage(
+      letterhead.dataUrl,
+      letterhead.format,
+      M + (CONTENT_W - imgW) / 2,
+      TOP,
+      imgW,
+      imgH,
+      undefined,
+      'FAST'
+    );
 
-    // gold hairline under the letterhead
+    // thin rule under the letterhead, flush with the text column
+    const ruleY = TOP + imgH + 6;
     doc.setFillColor(...GOLD);
-    doc.rect(0, imgH, PAGE_W, 0.5, 'F');
+    doc.rect(M, ruleY, CONTENT_W, 0.35, 'F');
 
     // document title (left) + reference and date (right)
+    const rowY = ruleY + 6.4;
     doc.setFont('helvetica', 'bold');
     doc.setCharSpace(0.55);
-    doc.setFontSize(8.6);
+    doc.setFontSize(8.4);
     doc.setTextColor(...INK);
-    doc.text(asciiSafe(L.subtitle).toUpperCase(), M, imgH + 7);
+    doc.text(asciiSafe(L.subtitle).toUpperCase(), M, rowY);
 
     doc.setFont('helvetica', 'normal');
     doc.setCharSpace(0.2);
@@ -171,12 +195,12 @@ export async function buildAgreementPdf({
     doc.text(
       asciiSafe(`${L.reference}: ${ref}   ·   ${L.date}: ${todayLong(submittedAt, 'en-MY')}`),
       PAGE_W - M,
-      imgH + 7,
+      rowY,
       { align: 'right' }
     );
     doc.setCharSpace(0.1);
 
-    y = imgH + 18;
+    y = rowY + 12;
   } else {
     doc.setFillColor(...INK);
     doc.rect(0, 0, PAGE_W, 44, 'F');
@@ -189,7 +213,7 @@ export async function buildAgreementPdf({
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
     doc.setCharSpace(0.9);
-    doc.text(asciiSafe(ACADEMY.name).toUpperCase(), M, 20);
+    doc.text(asciiSafe(ACADEMY.name).toUpperCase(), M, 21);
 
     doc.setCharSpace(0.1);
     doc.setFont('helvetica', 'normal');
@@ -227,7 +251,7 @@ export async function buildAgreementPdf({
   const ensure = (needed) => {
     if (y + needed <= BOTTOM) return;
     doc.addPage();
-    y = 22;
+    y = PAGE_TWO_TOP;
   };
 
   const sectionTitle = (text) => {
@@ -341,7 +365,17 @@ export async function buildAgreementPdf({
     doc.text(asciiSafe(term.label), M + 3, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...GREY);
-    doc.text(asciiSafe(term.period), M + 52, y);
+    /* keep a long free-text date list inside its column */
+    const periodText = asciiSafe(term.period);
+    const periodMaxW = 56;
+    let periodSize = 8.4;
+    doc.setFontSize(periodSize);
+    while (doc.getTextWidth(periodText) > periodMaxW && periodSize > 6.6) {
+      periodSize -= 0.3;
+      doc.setFontSize(periodSize);
+    }
+    doc.text(periodText, M + 52, y);
+    doc.setFontSize(8.4);
     if (term.sessions) doc.text(`${term.sessions} ${asciiSafe(L.classes)}`, M + 110, y);
     doc.setTextColor(...INK);
     doc.text(asciiSafe(formatMoney(term.price)), PAGE_W - M - 3, y, { align: 'right' });
@@ -440,14 +474,33 @@ export async function buildAgreementPdf({
   const pages = doc.getNumberOfPages();
   for (let page = 1; page <= pages; page += 1) {
     doc.setPage(page);
+
+    /* running header on pages 2+ so printed sheets stay identifiable */
+    if (page > 1) {
+      doc.setDrawColor(...LINE);
+      doc.setLineWidth(0.2);
+      doc.line(M, 20, PAGE_W - M, 20);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setCharSpace(0.5);
+      doc.setTextColor(...INK);
+      doc.text(asciiSafe(`${ACADEMY.name.toUpperCase()} · ${L.subtitle}`), M, 16.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setCharSpace(0.2);
+      doc.setTextColor(150, 145, 136);
+      doc.text(asciiSafe(`${L.reference}: ${ref}`), PAGE_W - M, 16.5, { align: 'right' });
+      doc.setCharSpace(0.1);
+    }
+
+    /* footer */
     doc.setDrawColor(...LINE);
     doc.setLineWidth(0.2);
-    doc.line(M, PAGE_H - 16, PAGE_W - M, PAGE_H - 16);
+    doc.line(M, FOOTER_RULE_Y, PAGE_W - M, FOOTER_RULE_Y);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.8);
     doc.setTextColor(150, 145, 136);
-    doc.text(asciiSafe(L.footerRef(ACADEMY.name, ACADEMY.companyNo, ref)), M, PAGE_H - 11);
-    doc.text(asciiSafe(L.page(page, pages)), PAGE_W - M, PAGE_H - 11, { align: 'right' });
+    doc.text(asciiSafe(L.footerRef(ACADEMY.name, ACADEMY.companyNo, ref)), M, FOOTER_TEXT_Y);
+    doc.text(asciiSafe(L.page(page, pages)), PAGE_W - M, FOOTER_TEXT_Y, { align: 'right' });
   }
 
   const base64 = doc.output('datauristring').split(',')[1];
