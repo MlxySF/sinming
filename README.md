@@ -79,9 +79,9 @@ GitHub Pages, plus a go-live checklist and troubleshooting.
 
 | Export | What it controls |
 | --- | --- |
-| `ACADEMY` | Name, email, phone, SSM/company number, **logo links** (site, PDF and emails) |
+| `ACADEMY` | Name, email, phone, SSM/company number, **logo links**, PDF letterhead |
 | `BANK` | Bank name, account name, account number |
-| `PAYMENT_TERMS` | The term checkboxes — term number, year, start/end dates, sessions, price (RM) |
+| `PAYMENT_TERMS` | The term checkboxes — term number, year, class dates (type them in your own words, e.g. `Jan 4, 11, 18, 25`), sessions, price (RM) |
 | `formatMoney` | Currency formatting (`RM`) |
 
 Wording lives in two dictionaries that mirror each other exactly:

@@ -40,7 +40,7 @@ function FeeDialog({ open, onClose, onStart }) {
               <div>
                 <div className="dialog__term-name">{term.label}</div>
                 <div className="dialog__term-meta">
-                  {term.period} · {fees.classesCount(term.sessions)}
+                  {term.sessions ? `${term.period} · ${fees.classesCount(term.sessions)}` : term.period}
                 </div>
               </div>
               <div className="dialog__term-price">{formatMoney(term.price)}</div>

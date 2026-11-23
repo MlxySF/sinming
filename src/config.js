@@ -39,6 +39,11 @@ export const ACADEMY = {
      Leave '' to hide it, or delete this line if you only need one logo. */
   logoRightUrl: 'https://wushusportacademy.com/cache/Subang%20Logo.png',
 
+  /* Letterhead used at the top of the signed agreement PDF. Paste a direct link
+     to a PNG/JPG (ideally ~1240 px wide, white background, with your logo and
+     contact details). Leave '' to fall back to the built-in dark header band. */
+  letterheadUrl: 'https://wushusportacademy.com/cache/WSP%20Letter.png',
+
   email: 'admin@wushusportacademy.com',
   phone: '019-219 1688',
   whatsapp: '019-219 1688',
@@ -101,14 +106,23 @@ export const BANK = {
      id       must be unique
      term     term number shown to parents
      year     year of the term
-     start / end  ISO dates (YYYY-MM-DD) — formatted per language automatically
-     sessions how many classes are included
+     dates    YOUR OWN WORDS for the class dates, e.g. 'Jan 4, 11, 18, 25'
+              — shown exactly as typed on the form, the PDF, the email and the
+              Google Sheet. If you fill this in, start/end are ignored.
+     datesZh  optional Chinese version of the same text (e.g. '1月4、11、18、25日')
+     start / end  ISO dates (YYYY-MM-DD) — only used when dates is empty
+     sessions how many classes are included (ignored when `dates` is filled in —
+              the number of classes is then counted from your date list)
      price    fee in MYR (numbers only)
    Parents can tick as many terms as they like — the total is added up.
    -------------------------------------------------------------------------- */
 export const PAYMENT_TERMS = [
   {
     id: 'term-1-2027',
+    // Your own words for the class dates — type them however you like, e.g.
+    //   dates: 'Jan 4, 11, 18, 25',
+    //   datesZh: '1月4、11、18、25日',   // optional Chinese version
+    dates: '',
     term: 1,
     year: 2027,
     start: '2027-01-04',
@@ -118,6 +132,7 @@ export const PAYMENT_TERMS = [
   },
   {
     id: 'term-2-2027',
+    dates: '',
     term: 2,
     year: 2027,
     start: '2027-04-05',
@@ -127,6 +142,7 @@ export const PAYMENT_TERMS = [
   },
   {
     id: 'term-3-2027',
+    dates: '',
     term: 3,
     year: 2027,
     start: '2027-07-12',
@@ -136,6 +152,7 @@ export const PAYMENT_TERMS = [
   },
   {
     id: 'term-4-2027',
+    dates: '',
     term: 4,
     year: 2027,
     start: '2027-10-04',

@@ -316,8 +316,6 @@ const en = {
     declaration:
       'I, the parent / guardian named above, confirm that I have read and understood the terms and conditions of Wushu Sport Academy, that I enrol my child of my own accord, and that I accept responsibility for the payment of all applicable class fees. I consent to the use of my electronic signature below, which is legally binding and equivalent to a handwritten signature.',
     authorisedSignature: 'AUTHORISED SIGNATURE',
-    forAndOnBehalf: 'For and on behalf of',
-    registrar: 'Registrar / Admin',
     page: (page, total) => `Page ${page} of ${total}`,
     footerRef: (academy, companyNo, ref) => `${academy} · SSM No. ${companyNo} · Reference ${ref}`,
     generatedNote: 'This document was generated electronically at the time of registration.',

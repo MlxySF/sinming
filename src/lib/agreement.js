@@ -17,6 +17,58 @@ const LINE = [206, 196, 180];
 /* The signed document is always issued in English. */
 const L = en.pdf;
 
+/**
+ * The letterhead image (ACADEMY.letterheadUrl) is fetched once and kept as a
+ * data URL. If it cannot be fetched — offline, moved file, or the server not
+ * sending CORS headers — the PDF falls back to the built-in dark header band,
+ * so a missing letterhead never blocks a registration.
+ */
+let letterheadCache = { url: null, value: null };
+
+function imageSize_(dataUrl) {
+  return new Promise((resolve) => {
+    if (typeof Image === 'undefined') return resolve(null);
+    const img = new Image();
+    img.onload = () => resolve({ width: img.naturalWidth || img.width, height: img.naturalHeight || img.height });
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+
+async function loadLetterhead() {
+  const url = (ACADEMY.letterheadUrl || '').trim();
+  if (!url || typeof document === 'undefined' || typeof fetch === 'undefined') return null;
+  if (letterheadCache.url === url) return letterheadCache.value;
+
+  let value = null;
+  try {
+    const response = await fetch(url, { mode: 'cors', cache: 'force-cache' });
+    if (response.ok) {
+      const blob = await response.blob();
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('unreadable image'));
+        reader.readAsDataURL(blob);
+      });
+      const size = await imageSize_(dataUrl);
+      if (dataUrl && size && size.width && size.height) {
+        value = {
+          dataUrl,
+          width: size.width,
+          height: size.height,
+          format: /^data:image\/jpe?g/i.test(dataUrl) ? 'JPEG' : 'PNG',
+        };
+      }
+    }
+  } catch (error) {
+    value = null;
+  }
+
+  letterheadCache = { url, value };
+  return value;
+}
+
 /* jsPDF is loaded on demand (~350 kB) so the landing page stays instant. */
 let jsPdfLoader = null;
 function loadJsPDF() {
@@ -89,56 +141,87 @@ export async function buildAgreementPdf({
   if (hasChinese) await ensureCjkFont();
 
   const doc = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
+  const letterhead = await loadLetterhead();
   let y = 0;
 
   /* ---------------------------------------------------------------- header */
-  doc.setFillColor(...INK);
-  doc.rect(0, 0, PAGE_W, 44, 'F');
+  if (letterhead) {
+    /* Letterhead fills the top of page 1, centred, never taller than 46 mm. */
+    const maxH = 46;
+    const scale = Math.min(PAGE_W / letterhead.width, maxH / letterhead.height);
+    const imgW = letterhead.width * scale;
+    const imgH = letterhead.height * scale;
+    doc.addImage(letterhead.dataUrl, letterhead.format, (PAGE_W - imgW) / 2, 0, imgW, imgH, undefined, 'FAST');
 
-  // thin gold rule at the bottom of the band
-  doc.setFillColor(...GOLD);
-  doc.rect(0, 44, PAGE_W, 0.7, 'F');
+    // gold hairline under the letterhead
+    doc.setFillColor(...GOLD);
+    doc.rect(0, imgH, PAGE_W, 0.5, 'F');
 
-  doc.setTextColor(...GOLD);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.setCharSpace(0.9);
-  doc.text(asciiSafe(ACADEMY.name).toUpperCase(), M, 20);
+    // document title (left) + reference and date (right)
+    doc.setFont('helvetica', 'bold');
+    doc.setCharSpace(0.55);
+    doc.setFontSize(8.6);
+    doc.setTextColor(...INK);
+    doc.text(asciiSafe(L.subtitle).toUpperCase(), M, imgH + 7);
 
-  doc.setCharSpace(0.1);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.6);
-  doc.setTextColor(190, 184, 174);
-  doc.text(
-    asciiSafe(`${ACADEMY.email}   |   ${ACADEMY.phone}`),
-    M,
-    27
-  );
+    doc.setFont('helvetica', 'normal');
+    doc.setCharSpace(0.2);
+    doc.setFontSize(7.2);
+    doc.setTextColor(...GREY);
+    doc.text(
+      asciiSafe(`${L.reference}: ${ref}   ·   ${L.date}: ${todayLong(submittedAt, 'en-MY')}`),
+      PAGE_W - M,
+      imgH + 7,
+      { align: 'right' }
+    );
+    doc.setCharSpace(0.1);
 
-  doc.setFontSize(7.4);
-  doc.setTextColor(...GOLD);
-  doc.setCharSpace(0.5);
-  doc.text(asciiSafe(L.subtitle), M, 36);
+    y = imgH + 18;
+  } else {
+    doc.setFillColor(...INK);
+    doc.rect(0, 0, PAGE_W, 44, 'F');
 
-  // reference block (right side of band)
-  doc.setFont('helvetica', 'normal');
-  doc.setCharSpace(0.2);
-  doc.setFontSize(7.2);
-  doc.setTextColor(150, 145, 136);
-  doc.text(asciiSafe(L.reference), PAGE_W - M, 17, { align: 'right' });
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(255, 255, 255);
-  doc.text(asciiSafe(ref), PAGE_W - M, 23, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.2);
-  doc.setTextColor(150, 145, 136);
-  doc.text(asciiSafe(L.date), PAGE_W - M, 31, { align: 'right' });
-  doc.setFontSize(9);
-  doc.setTextColor(235, 230, 222);
-  doc.text(asciiSafe(todayLong(submittedAt, 'en-MY')), PAGE_W - M, 37, { align: 'right' });
+    // thin gold rule at the bottom of the band
+    doc.setFillColor(...GOLD);
+    doc.rect(0, 44, PAGE_W, 0.7, 'F');
 
-  y = 56;
+    doc.setTextColor(...GOLD);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setCharSpace(0.9);
+    doc.text(asciiSafe(ACADEMY.name).toUpperCase(), M, 20);
+
+    doc.setCharSpace(0.1);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.6);
+    doc.setTextColor(190, 184, 174);
+    doc.text(asciiSafe(`${ACADEMY.email}   |   ${ACADEMY.phone}`), M, 27);
+
+    doc.setFontSize(7.4);
+    doc.setTextColor(...GOLD);
+    doc.setCharSpace(0.5);
+    doc.text(asciiSafe(L.subtitle), M, 36);
+
+    // reference block (right side of band)
+    doc.setFont('helvetica', 'normal');
+    doc.setCharSpace(0.2);
+    doc.setFontSize(7.2);
+    doc.setTextColor(150, 145, 136);
+    doc.text(asciiSafe(L.reference), PAGE_W - M, 17, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text(asciiSafe(ref), PAGE_W - M, 23, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.2);
+    doc.setTextColor(150, 145, 136);
+    doc.text(asciiSafe(L.date), PAGE_W - M, 31, { align: 'right' });
+    doc.setFontSize(9);
+    doc.setTextColor(235, 230, 222);
+    doc.text(asciiSafe(todayLong(submittedAt, 'en-MY')), PAGE_W - M, 37, { align: 'right' });
+
+    y = 56;
+  }
 
   /* ------------------------------------------------------------- helpers */
   const ensure = (needed) => {
@@ -259,7 +342,7 @@ export async function buildAgreementPdf({
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...GREY);
     doc.text(asciiSafe(term.period), M + 52, y);
-    doc.text(`${term.sessions} ${asciiSafe(L.classes)}`, M + 110, y);
+    if (term.sessions) doc.text(`${term.sessions} ${asciiSafe(L.classes)}`, M + 110, y);
     doc.setTextColor(...INK);
     doc.text(asciiSafe(formatMoney(term.price)), PAGE_W - M - 3, y, { align: 'right' });
     doc.line(M, y + 3, PAGE_W - M, y + 3);
@@ -309,12 +392,12 @@ export async function buildAgreementPdf({
   const sigBoxTop = y;
   doc.setDrawColor(...LINE);
   doc.setLineWidth(0.25);
-  doc.rect(M, sigBoxTop, 84, 30);
+  doc.rect(M, sigBoxTop, CONTENT_W, 30);
 
   if (signature) {
     try {
       const props = doc.getImageProperties(signature);
-      const maxW = 76;
+      const maxW = CONTENT_W - 8;
       const maxH = 24;
       const ratio = Math.min(maxW / props.width, maxH / props.height);
       const w = props.width * ratio;
@@ -335,7 +418,7 @@ export async function buildAgreementPdf({
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(...INK);
-  const parentNameLines = doc.splitTextToSize(asciiSafe(parent?.name || ''), 76);
+  const parentNameLines = doc.splitTextToSize(asciiSafe(parent?.name || ''), CONTENT_W - 8);
   doc.text(parentNameLines[0] || '', M, sigBoxTop + 39.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.6);
@@ -347,33 +430,6 @@ export async function buildAgreementPdf({
     M,
     sigBoxTop + 43.5
   );
-
-  // Academy acknowledgement block
-  const ax = M + 96;
-  doc.setDrawColor(...LINE);
-  doc.rect(ax, sigBoxTop, PAGE_W - M - ax, 30);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.6);
-  doc.setTextColor(...GREY);
-  doc.text(asciiSafe(L.forAndOnBehalf), ax + 5, sigBoxTop + 8);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.6);
-  doc.setTextColor(...INK);
-  doc.text(asciiSafe(ACADEMY.name), ax + 5, sigBoxTop + 13.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.2);
-  doc.setTextColor(...GREY);
-  doc.text(asciiSafe(L.registrar), ax + 5, sigBoxTop + 19);
-
-  // red academy seal
-  doc.setFillColor(...CRIMSON);
-  doc.roundedRect(PAGE_W - M - 24, sigBoxTop + 15, 18, 12, 1.6, 1.6, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.4);
-  doc.setCharSpace(0.4);
-  doc.text('WSA', PAGE_W - M - 15, sigBoxTop + 22.4, { align: 'center' });
-  doc.setCharSpace(0.1);
 
   /* ------------------------------------------------------------- footers */
   const pages = doc.getNumberOfPages();
