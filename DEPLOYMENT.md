@@ -208,6 +208,8 @@ Already handled — the build uses **relative** asset paths (`base: './'` in
 | Term dates / fees | `src/config.js` → `PAYMENT_TERMS` | `npm run build` + re-upload `dist` |
 | Bank account number | `src/config.js` → `BANK` | same |
 | Weekly class day / time / venue (step 1) | `src/config.js` → `CLASS_DETAILS` | same, both languages side by side |
+| Term names, class dates, sessions, prices | `src/config.js` → `PAYMENT_TERMS` | term number + `dates` only |
+| PDF letterhead | `src/config.js` → `ACADEMY.letterheadUrl` | same |
 | Academy name, phone, email | `src/config.js` → `ACADEMY` | same |
 | Terms & conditions wording | `src/i18n/en.js` + `src/i18n/zh.js` → `terms.list` | same |
 | Any English / Chinese wording | `src/i18n/en.js`, `src/i18n/zh.js` | same |
@@ -277,6 +279,19 @@ domain — no external dependency, no CORS, fastest option.
 
 **After any of the above:** `npm run build` → re-upload `dist`. The logo also
 becomes the browser tab icon automatically.
+
+**Letterhead on the signed PDF:** `ACADEMY.letterheadUrl` — a direct link to a
+PNG/JPG (about 1240 px wide, white background). It is printed across the top of
+page 1, and the dark header band is dropped so nothing repeats. If the file
+cannot be loaded the PDF silently falls back to the dark band, so a broken link
+never blocks a registration. Two things to know:
+
+- The image is fetched by the parent's browser, so the server hosting it must
+  send `Access-Control-Allow-Origin: *`. If the letterhead does not appear on the
+  live PDF, that is almost always the cause.
+- Safest option: drop the file in `src/assets/`, `import letterhead from
+  './assets/letterhead.png'` at the top of `src/config.js`, and set
+  `letterheadUrl: letterhead`. That removes the CORS question entirely.
 
 **A second logo (partner / federation) beside the title:** `ACADEMY.logoRightUrl`
 (same rules as above — any direct image link, or an imported file). It sits inside

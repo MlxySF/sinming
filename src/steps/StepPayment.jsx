@@ -126,7 +126,7 @@ export default function StepPayment({ data, update, errors, onNext, onBack, subm
     if (!selected.length) return copy.noneSelected;
     return copy.summary(
       selected.length,
-      selected.reduce((sum, term) => sum + term.sessions, 0)
+      selected.reduce((sum, term) => sum + Number(term.sessions || 0), 0)
     );
   }, [selected, copy]);
 
@@ -168,9 +168,11 @@ export default function StepPayment({ data, update, errors, onNext, onBack, subm
               </div>
               <div className="term-card__bottom">
                 <span className="term-card__price">{formatMoney(term.price)}</span>
-                <span className="term-card__sessions">
-                  {term.sessions} {m.fees.classes}
-                </span>
+                {term.sessions ? (
+                  <span className="term-card__sessions">
+                    {term.sessions} {m.fees.classes}
+                  </span>
+                ) : null}
               </div>
             </button>
           );
