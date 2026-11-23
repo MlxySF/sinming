@@ -37,7 +37,7 @@ export const ACADEMY = {
   /* Second logo, shown in the header right beside the academy name — e.g. a
      partner, federation or school logo. Paste any direct image link here.
      Leave '' to hide it, or delete this line if you only need one logo. */
-  logoRightUrl: 'https://wushusportacademy.com/cache/Subang%20Logo.png',
+  logoRightUrl: 'https://wushusportacademy.com/cache/Sin%20Ming%20Logo.png',
 
   /* Letterhead used at the top of the signed agreement PDF. Paste a direct link
      to a PNG/JPG (ideally ~1240 px wide, white background, with your logo and
@@ -95,10 +95,10 @@ export const CLASS_DETAILS = {
    BANK / PAYMENT DETAILS — update these with your real account.
    -------------------------------------------------------------------------- */
 export const BANK = {
-  bankName: 'Maybank',
-  accountName: 'Wushu Sport Academy Sdn Bhd',
-  accountNumber: '5123 4567 8901',
-  swift: 'MBBEMYKL',
+  bankName: 'Public Bank',
+  accountName: 'Chin Woo Sport Academy',
+  accountNumber: '3244180136',
+  swift: 'PBBEMYKL',
 };
 
 /* --------------------------------------------------------------------------
@@ -122,43 +122,46 @@ export const PAYMENT_TERMS = [
     // Your own words for the class dates — type them however you like, e.g.
     //   dates: 'Jan 4, 11, 18, 25',
     //   datesZh: '1月4、11、18、25日',   // optional Chinese version
-    dates: '',
+    dates: 'Jan 4, 11, 18, 25',
+    datesZh: '1 月 4、11、18、25',
     term: 1,
     year: 2027,
     start: '2027-01-04',
-    end: '2027-03-28',
-    sessions: 12,
-    price: 240,
+    end: '2027-01-25',
+    sessions: 4,
+    price: 120,
   },
   {
     id: 'term-2-2027',
-    dates: '',
+    dates: 'Feb 1, 8, 15, 22',
+    datesZh: '2 月 1, 8, 15, 22',
     term: 2,
     year: 2027,
-    start: '2027-04-05',
-    end: '2027-06-27',
-    sessions: 12,
-    price: 240,
+    start: '2027-02-01',
+    end: '2027-02-22',
+    sessions: 4,
+    price: 120,
   },
   {
     id: 'term-3-2027',
-    dates: '',
+    dates: 'March 1, 8, 15, 22',
+    datesZh: '3 月 1, 8, 15, 22',
     term: 3,
     year: 2027,
-    start: '2027-07-12',
-    end: '2027-09-26',
-    sessions: 11,
-    price: 220,
+    start: '2027-03-01',
+    end: '2027-03-22',
+    sessions: 4,
+    price: 120,
   },
   {
     id: 'term-4-2027',
-    dates: '',
+    dates: 'March 29, April 5, 12, 19',
     term: 4,
     year: 2027,
-    start: '2027-10-04',
-    end: '2027-12-19',
-    sessions: 11,
-    price: 220,
+    start: '2027-03-29',
+    end: '2027-04-19',
+    sessions: 4,
+    price: 120,
   },
 ];
 

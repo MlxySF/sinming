@@ -210,7 +210,7 @@ const en = {
         'The age could not be calculated — please check the first 6 digits of the NRIC.',
       athleteGender: 'Please select a gender.',
       athleteSchool: 'Please enter the current school.',
-      athleteClass: 'Please enter the class / level.',
+      athleteClass: 'Please enter your school class.',
       agreed: 'Please tick the consent checkbox to continue.',
       signature: 'Please sign in the box above.',
       agreementAlert: 'Please tick the consent box and sign in the box before continuing.',
@@ -225,8 +225,8 @@ const en = {
 
   success: {
     title: 'Registration received',
-    subtitle: 'Welcome to the academy',
-    leadBefore: (firstName) => `${firstName}’s place is reserved. A confirmation email with the signed agreement attached is on its way to `,
+    subtitle: 'Welcome to the Academy',
+    leadBefore: (firstName) => `${firstName}. A confirmation email with the signed agreement attached is on its way to `,
     leadAfter: '.',
     reference: 'Reference',
     rows: {
@@ -241,8 +241,7 @@ const en = {
     backHome: 'Back to home',
     nextTitle: 'What happens next',
     nextSteps: [
-      'Our admin verifies your payment receipt — usually within one working day.',
-      'You will receive a WhatsApp message with the class venue, timing and first-lesson details.',
+      'Our admin verifies your payment receipt.',
       'Keep the agreement PDF safe — it is your signed copy of the terms.',
     ],
     demoTitle: 'Preview mode:',
@@ -296,7 +295,7 @@ const en = {
     athleteAge: 'Age',
     athleteGender: 'Gender',
     athleteSchool: 'Current school',
-    athleteClass: 'Class / level',
+    athleteClass: 'School Class',
     yearsOld: (age) => `${age} years old`,
     colTerm: 'TERM',
     colPeriod: 'PERIOD',
