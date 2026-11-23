@@ -16,6 +16,17 @@ function loadJsPDF() {
   return jsPdfLoader;
 }
 
+/** Make sure the CJK webfont is ready before drawing it to a canvas. */
+async function ensureCjkFont() {
+  try {
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.load) {
+      await document.fonts.load('600 72px "Noto Serif SC"', '陳家豪');
+    }
+  } catch (error) {
+    /* fall back to the device's own CJK font */
+  }
+}
+
 /**
  * jsPDF's built-in fonts cannot render Chinese characters, so any name that
  * contains CJK text is drawn to an invisible canvas by the browser and placed
@@ -33,6 +44,9 @@ function textImage(text, { sizePx = 72, weight = 600, color = '#14171c' } = {}) 
     canvas.width = Math.max(width, 8);
     canvas.height = height;
     const draw = canvas.getContext('2d');
+    // opaque white background: avoids any alpha-channel quirks in PDF viewers
+    draw.fillStyle = '#ffffff';
+    draw.fillRect(0, 0, canvas.width, canvas.height);
     draw.font = font;
     draw.fillStyle = color;
     draw.textBaseline = 'middle';
@@ -65,6 +79,10 @@ export async function buildAgreementPdf({
   submittedAt = new Date(),
 }) {
   const JsPDF = await loadJsPDF();
+  const hasChinese = /[^\x00-\xFF]/.test(
+    `${athlete?.chineseName || ''}${athlete?.name || ''}${parent?.name || ''}`
+  );
+  if (hasChinese) await ensureCjkFont();
   const doc = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
   let y = 0;
 
