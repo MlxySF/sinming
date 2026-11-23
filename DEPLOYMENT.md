@@ -281,8 +281,11 @@ domain — no external dependency, no CORS, fastest option.
 becomes the browser tab icon automatically.
 
 **Letterhead on the signed PDF:** `ACADEMY.letterheadUrl` — a direct link to a
-PNG/JPG (about 1240 px wide, white background). It is printed across the top of
-page 1, and the dark header band is dropped so nothing repeats. If the file
+PNG/JPG (about 1240 px wide, white background). It is printed inside the page
+margins at the top of page 1 (like a printed letterhead), and the dark header band
+is dropped so nothing repeats. Its height is capped by `LETTERHEAD_MAX_H` near the
+top of `src/lib/agreement.js` — change that one number (millimetres) to make the
+letterhead bigger or smaller. If the file
 cannot be loaded the PDF silently falls back to the dark band, so a broken link
 never blocks a registration. Two things to know:
 
