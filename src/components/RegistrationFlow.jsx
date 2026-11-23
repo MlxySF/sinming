@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ACADEMY, FORM_TOKEN } from '../config';
+import { ACADEMY, FORM_TOKEN, IS_DEMO_MODE } from '../config';
 import Stepper, { STEPS } from './Stepper';
 import StepAgreement from '../steps/StepAgreement';
 import StepParent from '../steps/StepParent';
@@ -30,9 +30,34 @@ const EMPTY_DATA = {
 
 const NAME_RE = /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z\u4e00-\u9fa5 .'’\-/]*$/;
 
+const DRAFT_KEY = 'wsa-registration-draft';
+
+/**
+ * Keeps whatever the parent has typed so far in sessionStorage.
+ * Files are never stored — they just re-upload the receipt at step 4.
+ */
+function loadDraft() {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw);
+    return {
+      ...EMPTY_DATA,
+      ...saved,
+      parent: { ...EMPTY_DATA.parent, ...(saved.parent || {}) },
+      athlete: { ...EMPTY_DATA.athlete, ...(saved.athlete || {}) },
+      receipt: null,
+      terms: Array.isArray(saved.terms) ? saved.terms : [],
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
 export default function RegistrationFlow({ onComplete, onExit }) {
   const [step, setStep] = useState(0);
-  const [data, setData] = useState(EMPTY_DATA);
+  const [data, setData] = useState(() => loadDraft() || EMPTY_DATA);
+  const [restored] = useState(() => Boolean(loadDraft()));
   const [errors, setErrors] = useState({});
   const [completed, setCompleted] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -184,6 +209,11 @@ export default function RegistrationFlow({ onComplete, onExit }) {
         },
       });
 
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+      } catch (error) {
+        /* ignore */
+      }
       const pdfUrl = URL.createObjectURL(agreement.doc.output('blob'));
 
       onComplete?.({
@@ -205,6 +235,17 @@ export default function RegistrationFlow({ onComplete, onExit }) {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...data, receipt: null }));
+      } catch (error) {
+        /* storage full or blocked — not critical */
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [data]);
 
   useEffect(() => {
     document.title = `${ACADEMY.name} — Registration`;
@@ -235,9 +276,15 @@ export default function RegistrationFlow({ onComplete, onExit }) {
             </span>
           </div>
 
-          <span className="shell__secure">
-            <Lock size={12} /> Secure form
-          </span>
+          {IS_DEMO_MODE ? (
+            <span className="shell__secure shell__secure--demo">
+              <span className="shell__dot" /> Preview · not connected
+            </span>
+          ) : (
+            <span className="shell__secure">
+              <Lock size={12} /> Secure form
+            </span>
+          )}
         </div>
       </header>
 
@@ -251,6 +298,11 @@ export default function RegistrationFlow({ onComplete, onExit }) {
             Four short steps: sign the agreement, tell us about the parent and athlete, then choose
             your term(s) and upload your payment receipt.
           </p>
+          {restored && (
+            <p style={{ marginTop: 8, fontSize: 12, color: '#1c7c4a' }}>
+              ✓ We restored your draft from this visit — please re-upload your receipt at step 4.
+            </p>
+          )}
         </div>
 
         <Stepper current={step} completed={completed} onJump={(index) => setStep(index)} />

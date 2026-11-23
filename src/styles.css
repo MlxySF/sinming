@@ -816,6 +816,22 @@ a {
   color: rgba(244, 239, 230, 0.5);
 }
 
+.shell__secure--demo {
+  color: var(--gold-soft);
+  border: 1px solid rgba(224, 180, 92, 0.3);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(224, 180, 92, 0.08);
+}
+
+.shell__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px rgba(224, 180, 92, 0.16);
+}
+
 .shell__main {
   flex: 1;
   width: 100%;
@@ -2235,7 +2251,23 @@ a {
     bottom: -2vh;
     opacity: 0.55;
   }
-  .shell__main {
+  .shell__secure--demo {
+  color: var(--gold-soft);
+  border: 1px solid rgba(224, 180, 92, 0.3);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(224, 180, 92, 0.08);
+}
+
+.shell__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px rgba(224, 180, 92, 0.16);
+}
+
+.shell__main {
     padding: 24px 16px 70px;
   }
   .shell__header-inner {
