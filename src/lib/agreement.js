@@ -371,15 +371,20 @@ export async function buildAgreementPdf({
 
   /* -------------------------------------------------------------- 04 terms */
   sectionTitle(`04  ${L.s4}`);
-  en.terms.list.forEach((item, index) => {
-    ensure(16);
+  en.terms.list.forEach((clause, index) => {
+    const lines = doc.splitTextToSize(asciiSafe(clause), CONTENT_W - 10);
+    ensure(lines.length * 4.4 + 3);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.7);
+    doc.setFontSize(8.4);
     doc.setTextColor(...INK);
-    doc.text(`${index + 1}.  ${asciiSafe(item.title)}`, M, y);
-    y += 4.6;
-    para(item.body, { indent: 5.2 });
-    y += 1.6;
+    doc.text(`${index + 1}.`, M, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...GREY);
+    lines.forEach((line) => {
+      doc.text(line, M + 9, y);
+      y += 4.4;
+    });
+    y += 2;
   });
 
   /* -------------------------------------------------------- 05 declaration */

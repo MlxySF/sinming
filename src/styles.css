@@ -1423,7 +1423,7 @@ a {
 
 .terms-box {
   position: relative;
-  max-height: 306px;
+  max-height: 340px;
   overflow-y: auto;
   padding: 24px 26px;
   border: 1px solid var(--line);
@@ -1482,14 +1482,6 @@ a {
   letter-spacing: 0.04em;
   color: var(--crimson);
   opacity: 0.85;
-}
-
-.terms-list strong {
-  display: block;
-  margin-bottom: 2px;
-  font-size: 13.2px;
-  font-weight: 700;
-  color: var(--ink);
 }
 
 .terms-scroll-hint {
@@ -2459,12 +2451,6 @@ html[data-lang='zh'] .signature__placeholder {
 html[data-lang='zh'] .terms-box__title {
   font-family: var(--font-cjk);
   letter-spacing: 0.1em;
-}
-
-html[data-lang='zh'] .terms-list li strong {
-  font-family: var(--font-cjk);
-  font-weight: 600;
-  letter-spacing: 0.03em;
 }
 
 html[data-lang='zh'] .form-intro h1 {

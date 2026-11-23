@@ -51,11 +51,8 @@ export default function StepAgreement({ data, update, errors, onNext, onBack, sh
           <SignatureIcon size={15} /> {ACADEMY.name} — {m.terms.heading}
         </div>
         <ol className="terms-list">
-          {m.terms.list.map((term) => (
-            <li key={term.title}>
-              <strong>{term.title}</strong>
-              {term.body}
-            </li>
+          {m.terms.list.map((clause, index) => (
+            <li key={index}>{clause}</li>
           ))}
         </ol>
       </div>

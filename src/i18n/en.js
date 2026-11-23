@@ -255,31 +255,23 @@ const en = {
   terms: {
     heading: 'Terms & Conditions',
     list: [
-      {
-        title: 'Enrolment & monthly fees',
-        body:
-          'By registering, the parent / guardian agrees to enrol their child in Wushu Sport Academy classes and accepts responsibility for paying the class fees for every month of the selected term(s), on or before the first lesson of each month. Fees are non-transferable and are only refundable at the Academy’s discretion.',
-      },
-      {
-        title: 'Schedule adjustments',
-        body:
-          'Wushu Sport Academy reserves the right to make adjustments to the class schedule, venue, coach or timing at short notice whenever there are competitions, performances, examinations, public holidays or other events falling on the same day. Parents will be informed as early as possible through the registered contact details.',
-      },
-      {
-        title: 'Replacement classes',
-        body:
-          'Replacement classes are provided only when the Academy cancels a session. Parents may not cancel classes on their own. If the student cannot attend due to sickness or another valid reason, leave must be applied for with the admin and the coach in advance; unapproved absences will be recorded.',
-      },
-      {
-        title: 'Accepted reasons for leave',
-        body:
-          'Only medical leave (sickness, supported by an MC where applicable), competitions or official school examinations are accepted for replacement classes. Personal holidays, family trips and other personal reasons are not accepted for replacements and no make-up class or refund will be provided.',
-      },
-      {
-        title: 'Signature & consent',
-        body:
-          'The electronic signature provided in this form carries the same legal weight as a handwritten signature. The parent / guardian confirms that all information given is true and accurate, and consents to the Academy storing and using this information for enrolment, payment, safety and communication purposes.',
-      },
+      'I, the student/parent/guardian, confirm that all information provided above is true and correct.',
+      'I understand that Wushu is a high-intensity sport and agree to bear any risk of injury during training.',
+      'The Academy reserves the right to adjust training times or venues when necessary and will notify in advance.',
+      'Fees paid are strictly non-refundable under all circumstances.',
+      'I agree to follow all instructions, rules, and arrangements set by the Academy and coaches.',
+      'Replacement classes are only provided when the Academy cancels a session; parents may not cancel classes on their own.',
+      'If the student cannot attend due to sickness or other reasons, leave must be applied for with admin and coach; unapproved absences will be recorded.',
+      'School team athletes must attend all training, maintain good attitude, and accept strict training and discipline.',
+      'Students with injuries or illness should not attend training; any consequences are at their own risk.',
+      'If a student is injured during training, parents consent to and authorize us to provide immediate medical assistance, including sending the student to the nearest clinic if needed.',
+      'Any injury resulting from fighting between athletes or any accident shall be the sole responsibility of the individuals involved; the Academy will not be liable for any medical fees.',
+      'The Academy is not responsible for any valuables belonging to students or parents.',
+      'Fighting, quarrelling, bully, poor attitude, or refusing to cooperate with training may result in removal from the school team and the Academy.',
+      'Eating, consuming snacks and sweets are not allowed during training.',
+      'Parents are not allowed to interfere with professional training plans or discipline set by the coaches.',
+      'Parents must send and pick up their children on time and are fully responsible for transport safety.',
+      'Training sessions may be recorded or photographed for publicity; parents who do not consent must inform the Academy in writing.',
     ],
   },
 
