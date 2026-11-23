@@ -5,6 +5,7 @@ import { allTermOptions } from '../lib/terms';
 import { ArrowRight, Check } from './Icons';
 import LanguageToggle from './LanguageToggle';
 import BrandMark from './BrandMark';
+import SecondaryLogo from './SecondaryLogo';
 import heroImage from '../assets/hero-wushu.jpg';
 
 function FeeDialog({ open, onClose, onStart }) {
@@ -94,16 +95,7 @@ export default function Landing({ onStart }) {
           <span className="brand__text">
             <span className="brand__name">{ACADEMY.name}</span>
           </span>
-          {ACADEMY.logoRightUrl ? (
-            <img
-              className="brand__logo brand__logo--right"
-              src={ACADEMY.logoRightUrl}
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-              decoding="async"
-            />
-          ) : null}
+          <SecondaryLogo />
         </div>
 
         <LanguageToggle />
